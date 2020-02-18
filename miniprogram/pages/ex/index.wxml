@@ -1,0 +1,19 @@
+<!--pages/ex/index.wxml-->
+<view style="text-align: center;">
+  <view style="color: #d81e06;text-align: center;font-size: 36rpx;margin: 10px;">请务必按以下格式上传名单txt文件</view>
+  <view>
+    <image catchtap="preview" style="width: 655rpx;height: 427rpx;" src="{{images.ex}}"></image>
+  
+  </view>
+  <view style="text-align: left;">
+  <view>1. 打开电脑的“记事本”；</view>
+  <view>2. 在第一行：输入<text style="font-style: italic">姓名</text>，按Tab键，输入<text style="font-style: italic">手机号</text></view>
+  <view>
+  3. 在第二行开始，输入每个人的姓名和电话，每一行只写一个人的信息，比如输入
+  <text style="font-style: italic">张三 </text>按下Tab键  输入<text style="font-style: italic">13866088901</text>
+  </view>
+  <view>4. 输入完所有人的信息后，保存为txt格式的文件。注意，保存的时候请将编码格式选择为‘UTF-8’。</view>
+  <view>5. 请先把这个txt文件通过微信文件传输助手发给自己，然后在我们的小程序中按加号键，选取聊天记录中、已经传给自己的那个txt文件。</view>
+  </view>
+
+</view>

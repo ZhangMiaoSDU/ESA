@@ -1,0 +1,48 @@
+/* pages/fillBlank/index.wxss */
+.content {
+  padding: 20px;
+}
+
+.content .list {
+  width: 100%;
+  color: #3c3c3c;
+}
+
+.text {
+  border: 1px solid #f7f7f7;
+  height: 40px;
+  margin-top: 10px;
+  padding: 5px;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-view {
+  background: #fff;
+  margin: 50px 0;
+}
+
+.item {
+  margin-bottom: 20px
+}
+
+
+.option-item {
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.option-input {
+  border: 1px solid #ddd;
+  width: 100%;
+  border-radius: 20px;
+}
+
+.option-image {
+  display: flex;
+  align-items: center;
+  margin: 0 5px;
+}

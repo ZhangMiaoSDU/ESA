@@ -1,0 +1,72 @@
+<!--pages/regi/index.wxml-->
+<view class="container"  style="position: relative; width: {{screenWidth-30}}px">
+  <!-- <view bindtap="doClick">chooseAddress</view> -->
+  <view class="heading">注册信息</view>
+  <scroll-view scroll-y class="content list"  style="padding-bottom: 40px; height: {{windowHeight - 140}}px">
+    <view class="idcard">
+      <image src="{{images.camera}}"></image>
+      <text style="color: #0FB148;" bindtap="doClick">扫描身份证</text>
+    </view>
+    <view class="item">
+      <text>姓名</text>
+      <input bindinput="bindName" value="{{name}}"></input>
+    </view>
+    <view class="item">
+      <text>性别</text> 
+      <input bindinput="bindSex" value="{{sex}}"></input>
+    </view>
+    <view class="item">
+      <text>民族</text> 
+      <input bindinput="bindNation" value="{{nation}}"></input>
+    </view>
+    <view class="item">
+      <text>出生日期</text> 
+      <input bindinput="bindBirth" value="{{brith}}" placeholder="格式：20190101"></input>
+    </view>
+    <view class="item">
+      <text>QQ</text> 
+      <input bindinput="bindQQ" value="{{QQ}}"></input>
+    </view>
+    <view class="item">
+      <text>手机号码</text> 
+      <input bindinput="bindP" value="{{phone}}"></input>
+    </view>
+    <view class="item">
+      <text>身份证号码</text> 
+      <input bindinput="bindIdN" value="{{idNo}}"></input>
+    </view>
+    <view class="item">
+      <text>身份证住址</text> 
+      <view bindtap="chooseLocation" data-index="0" class="ellipsis" style="width: {{screenWidth-150}}px">
+        {{idcardLocation ? idcardLocation:'选择地址'}}
+      </view>
+    </view>
+    <view>
+      <text>* 当前住址是否与身份证地址一致？ </text>
+      <radio-group bindchange="checkboxChange" style="display: flex;flex-direction: column;"> 
+        <label class="checkbox" style="padding: 5px;">
+          <radio value="y">是</radio>
+        </label>
+        <label class="checkbox" style="padding: 5px;">
+          <radio value="n">否</radio>
+        </label>
+      </radio-group>
+    </view>
+   
+    <view class="item" wx:if="{{!sameLocation}}">
+      <text>当前住址</text> 
+      <view bindtap="chooseLocation" data-index="1"  class="ellipsis" style="width: {{screenWidth-150}}px">
+        {{currentLocation ? currentLocation: '选择地址'}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="footer" style="position: fixed;bottom: 20px;width: {{screenWidth-30}}px;height: 40px;">
+    <view catchtap="clickConfirm" style="width: 100%">确定</view>
+  </view>
+</view>
+
+
+
+
+

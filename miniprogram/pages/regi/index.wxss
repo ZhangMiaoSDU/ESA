@@ -1,0 +1,88 @@
+/* pages/regi/index.wxss */
+page {
+  background: rgba(255,177,146, .4);
+  position: fixed;
+}
+
+.container {
+  height: 100%;
+  background: rgba(246, 246, 246, .96);
+  padding: 10px;
+  margin: 10px 5px;
+  border-radius: 10px;
+}
+
+.heading {
+  /* color: rgb(15, 177, 72); */
+  font-size: 30px;
+  height: 40px;
+  /* text-align: center; */
+  padding: 10px;
+  font-weight: bold;
+  /* background: rgba(219, 244, 224); */
+  /* border-radius: 60px; */
+}
+
+
+.content.list {
+  /* margin: 0 20px 0 10px; */
+  color: #333;
+  font-size: 14px;
+  /* padding-top: 20px; */
+}
+
+.list .item {
+  margin-bottom: 20px;
+  height: 30px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 30px;
+  display: flex;
+  align-items: center
+}
+
+.list .item input {
+  flex: 1;
+}
+
+.list .item text {
+  width: 200rpx;
+}
+
+.idcard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin-bottom: 40px; */
+  /* background: #DBF4E0; */
+  padding: 20px;
+  /* margin: 0 -10px; */
+  /* border-bottom: 1px solid #DBF4E0; */
+}
+
+.idcard image {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.footer {
+  /* margin-top: 30px; */
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer view {
+  width: 40%;
+  text-align: center;
+  background: rgba(219, 244, 224);
+  padding: 10px;
+  border-radius: 20px;
+  color: rgb(15, 177, 72);
+  line-height: 20px;
+}
+
+.checkbox {
+  display: flex
+}
+

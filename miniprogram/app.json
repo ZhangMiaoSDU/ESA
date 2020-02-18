@@ -1,0 +1,71 @@
+{
+  "pages": [
+    
+    "pages/index/index",
+    "pages/fillJQ/index",
+    "pages/temp/index",
+    "pages/ques/index",
+    "pages/list/index",
+    "pages/award/index",
+    "pages/regi/index",
+    "pages/ex/index",
+    "pages/detail/index",
+    "pages/home/index",
+    "pages/coredata/index",
+    "pages/jqStat/index",
+    "pages/chart/index",
+    "pages/contact/index",
+    "pages/tip/index",
+    
+    "pages/createJQ/index",
+    "pages/province/index",
+    "pages/config/index",
+    "pages/fillBlank/index"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将有助于增强使用时的体验"
+    }
+  },
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "最多填一次",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#989898",
+    "selectedColor": "rgb(15, 177, 72)",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "主页",
+        "iconPath": "./images/home.png",
+        "selectedIconPath": "./images/home-active.png"
+      },
+      {
+        "pagePath": "pages/award/index",
+        "text": "注册领奖学金",
+        "iconPath": "./images/award.png",
+        "selectedIconPath": "./images/award-active.png"
+      },
+      {
+        "pagePath": "pages/province/index",
+        "text": "疫情统计",
+        "iconPath": "./images/statistics.png",
+        "selectedIconPath": "./images/statistics-active.png"
+      },
+      {
+        "pagePath": "pages/contact/index",
+        "text": "快速联系",
+        "iconPath": "./images/contact.png",
+        "selectedIconPath": "./images/contact-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

@@ -1,0 +1,20 @@
+{
+  "triggers": [
+    {
+      "name": "timedTask",
+      "type": "timer",
+      "config": "0 0 */1 * * * *"
+    }
+  ],
+  "permissions": {
+    "openapi": [
+      "wxacode.get",
+      "templateMessage.send",
+      "templateMessage.addTemplate",
+      "templateMessage.deleteTemplate",
+      "templateMessage.getTemplateList",
+      "templateMessage.getTemplateLibraryById",
+      "templateMessage.getTemplateLibraryList"
+    ]
+  }
+}

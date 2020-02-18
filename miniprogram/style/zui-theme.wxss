@@ -1,0 +1,3 @@
+.alert:not(.alert-block) {
+  border-radius: 0;
+}

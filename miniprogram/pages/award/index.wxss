@@ -1,0 +1,121 @@
+/* pages/award/index.wxss */
+page {
+  background: rgba(255,177,146, .4);
+  position: fixed;
+}
+
+.container {
+  height: 100%;
+  background: rgba(246, 246, 246, .96);
+  padding:20rpx;
+  margin: 20rpx 10rpx;
+  border-radius: 20rpx;
+}
+
+.heading {
+  /* color: rgb(15, 177, 72); */
+  font-size: 60rpx;
+  height: 80rpx;
+  /* text-align: center; */
+  padding: 20rpx;
+  font-weight: bold;
+  /* background: rgba(219, 244, 224); */
+  /* border-radius: 60px; */
+}
+
+
+.content.list {
+  /* margin: 0 20px 0 10px; */
+  color: #333;
+  font-size: 28rpx;
+  /* padding-top: 20px; */
+}
+
+.list .item {
+  margin-bottom: 40rpx;
+  height: 60rpx;
+  font-size: 32rpx;
+  font-weight: 300;
+  line-height: 60rpx;
+  display: flex;
+  align-items: center
+}
+
+.item:not(.pos) input {
+  flex: 1
+}
+
+.item.pos input {
+  position: absolute;
+  right: 60rpx;
+  width: 50%;
+}
+
+.list .item text {
+  width: 300rpx;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer view {
+  width: 40%;
+  text-align: center;
+  background: rgba(219, 244, 224);
+  padding: 20rpx;
+  border-radius: 40rpx;
+  color: rgb(15, 177, 72);
+  line-height: 40rpx;
+}
+
+.checkbox {
+  display: flex
+}
+
+.pos {
+  position: relative
+}
+
+.pos .picker {
+  position: absolute;
+  right: 0px;
+}
+
+.pos .picker .picker-view {
+  display: flex;
+  justify-content: space-between;
+  height: 60rpx;
+  padding: 20rpx; 
+  align-items: center
+}
+
+.mcontent {
+  background: rgba(219, 244, 224);
+  padding: 20rpx 40rpx;
+  text-align: center;
+  border-radius: 20rpx;
+}
+
+
+.idcard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin-bottom: 40px; */
+  /* background: #DBF4E0; */
+  padding: 40rpx;
+  /* margin: 0 -10px; */
+  /* border-bottom: 1px solid #DBF4E0; */
+}
+
+.idcard image {
+  width: 60rpx;
+  height: 60rpx;
+  margin-right: 20rpx;
+}
+
+.course.checkbox {
+  padding: 10rpx;
+}

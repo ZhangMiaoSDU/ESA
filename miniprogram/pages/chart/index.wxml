@@ -1,0 +1,10 @@
+<!--pages/chart/index.wxml-->
+<view class="chart" id="trend-chart" style="height: 200px">
+  <view style="position: relative; width: {{screenWidth - 10}}px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+    <view class="chart-container">
+      <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ecline }}"></ec-canvas>
+    </view>
+  </view>  
+</view>
+
+

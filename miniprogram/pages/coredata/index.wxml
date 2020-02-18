@@ -1,0 +1,73 @@
+<!--pages/coredata/index.wxml-->
+<view class="container">
+  <view class="navBar" style="padding-top: {{statusBarHeight}}px;height: {{navigatorH}}px; width: {{screenWidth}}px">
+    <view class="left" style="justify-content: space-between">
+      <view class="icon-back back-btn" bindtap="goBack">返回主页</view>
+    </view>
+  </view>
+  <view class="content" style="margin-top:{{statusBarHeight + navigatorH}}px">  
+    <!-- <view bindtap="loadJQ">query</view> -->
+    <scroll-view scroll-y style="height: 100%" class="lists">
+      <block wx:for="{{jqs}}" wx:key="index">
+        <view class="item" style="position: relative;">
+          <view class="labeltext">{{item.type == 0 ? '一次性' : item.type == 1 ? '按月' : '按日'}}</view>
+          <view class="detail">
+            <view style="display: flex;justify-content: space-between;">
+              <view style="height: 120rpx;line-height: 60rpx; width:{{screenWidth-70}}px" 
+              catchtap="getJQDetail" data-num="{{item.questions.length}}" data-id="{{item._id}}">
+                <view style="display: flex">
+                  <view>{{item.name}}</view>
+                  <view style="font-size: 24rpx; margin-left: 40rpx">ID:{{item.creationTime}}</view>
+                </view>
+                <view style="font-size: 24rpx;">
+                  <view wx:if="{{item.required || item.required == 0}}">
+                    <text class="label label-warning">应填人数({{item.required}})</text>
+                    <text class="label label-success" catchtap="viewfilled" data-id="{{item._id}}" style="margin: 0 5rpx"> 今日已填人数({{item.filled}})</text>
+                    <text class="label label-danger" catchtap="viewUnfilled" data-id="{{item._id}}">查看未填</text>
+                  </view>
+                </view>
+              </view>
+              <view class="image-view">
+                <button class="share-btn" style="width:80rpx;" open-type="share" data-jqid="{{item._id}}">
+                  <image src="{{images.share}}" style="width: 40rpx; height: 40rpx"></image>
+                </button>
+                <image src='{{images.download}}' data-id="{{item._id}}" catchtap="downloadData" style="width: 50rpx; height: 50rpx"></image>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+  </view>
+</view>
+
+
+<view class="mask" wx:if="{{showMask}}">
+  <view class="mask-content">
+    <view>
+      <view class="title">复制下载链接，打开浏览器访问即可下载文件</view>
+      <view class="ellipsis">{{fileUrl}}</view>
+    </view>
+    <view class="next-btn btn" catchtap="copyFileUrl">
+      点击复制
+    </view>
+  </view>
+</view>
+
+
+<!-- <view class="mask">
+  <view class="mask-content">
+    <view>选择日期</view>
+    <view class="mask-list">
+      <view class="mask-item">
+        <view>2020-02-16</view>
+        <image src='{{images.download}}' style="width: 30px; height: 30px"></image>
+      </view>
+      <view class="mask-item">
+        <view>2020-02-17</view>
+        <image src='{{images.download}}' style="width: 30px; height: 30px"></image>
+      </view>
+    </view>
+  </view>
+</view> -->
+

@@ -1,0 +1,144 @@
+/* pages/home/index.wxss */
+@import "../../style/zui.wxss";
+@import "../../style/zui-theme.wxss";
+page {
+  /* height: 100% */
+  position: fixed
+}
+
+.container {
+  padding: 20rpx;
+  height: 100%;
+  /* background: rgba(246, 246, 246, .96) */
+  background: rgba(255,177,146, .4);
+
+}
+
+.menu {
+  height: 120rpx;
+  /* padding: 10px 15px; */
+  /* background: rgba(219, 244, 224); */
+
+}
+
+.menu .list {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.menu .list .img {
+  /*background: #fff;
+  display: flex;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 5rpx;*/
+  display: flex;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  padding: 5rpx;
+  margin-right: 10rpx;
+
+}
+
+.menu .list .img image {
+  /* width: 32px; */
+  /* height: 32px; */
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.menu .list .item {
+  /*display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20rpx 0;
+  background: rgba(255, 255, 255, .6);
+  padding: 10rpx 24rpx;
+  border-radius: 50rpx;
+}
+
+.menu .list .item .text {
+  font-size: 30rpx;
+  color: rgba(244, 162, 65);/* rgba(255, 149, 52, .7); */
+  /* margin-top: 10rpx; */
+}
+
+.tabs-item-active-external {
+  background: #fff;
+}
+
+.news, .rumors {
+  background: #fff;
+  /* padding: 5rpx; */
+  padding-top: 0px;
+  /* border-radius: 10px; */
+  margin-bottom: 20rpx;
+}
+
+.news .items, .rumors .items {
+  margin: 0 10rpx;
+}
+
+.news .news-detail {
+  background: #f6f6f6;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  font-size: 24rpx;
+  color: #808080;
+}
+
+.news .item-footer {
+  font-size: 24rpx;
+}
+
+.btn {
+  color: rgba(47, 127, 240, .8);
+  background: rgba(47, 127, 240, .1);
+}
+
+/* .mask .mask-content {
+  padding: 10px;
+  border-radius: 20px;
+  background: #fff;
+  width: 80%;
+}
+
+.mask input {
+  border-bottom: 1px solid #ddd;
+  margin-top: 10px;
+  text-align: center;
+  color: #3c3c3c;
+}
+
+.mask .title {
+  text-align: center;
+  font-size: 16px;
+  color: #3c3c3c;
+  margin: 10px;
+}
+
+.next-btn {
+  height: 40px;
+  line-height: 40px;
+  border-radius: 30px;
+  margin-top: 30px;
+}
+ */
+
+.fixed {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background: rgba(255,224, 213);
+
+}

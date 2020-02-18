@@ -1,0 +1,175 @@
+<!--pages/award/index.wxml-->
+<view wx:if="{{!isFill}}" class="container"  style="position: relative; height: {{windowHeight - 90}}px">
+  <!-- <view bindtap="doClick">chooseAddress</view> -->
+  <view class="heading">注册领奖学金</view>
+  <scroll-view scroll-y class="content list"  style="padding-bottom: 100rpx; height: {{windowHeight - 220}}px">
+    <view class="idcard" bindtap="doClick">
+      <image src="{{images.camera}}"></image>
+      <text style="color: #0FB148;">扫描身份证</text>
+    </view>
+    <view class="item">
+      <text>姓名</text>
+      <input bindinput="bindName" value="{{name}}"></input>
+    </view>
+    <view class="item">
+      <text>性别</text> 
+      <input bindinput="bindSex" placeholder="(选填)" value="{{sex}}"></input>
+    </view>
+    <view class="item">
+      <text>民族</text> 
+      <input bindinput="bindNation" placeholder="(选填)"value="{{nation}}"></input>
+    </view>
+    <view class="item">
+      <text>出生日期</text> 
+      <input bindinput="bindBirth" value="{{brith}}" placeholder="（选填）格式：20190101"></input>
+    </view>
+    <view class="item">
+      <text>QQ</text> 
+      <input bindinput="bindQQ" placeholder="(选填)" value="{{QQ}}"></input>
+    </view>
+    <view class="item">
+      <text>手机号码</text> 
+      <input bindinput="bindP" value="{{phone}}"></input>
+    </view>
+    <view class="item">
+      <text>身份证号码</text> 
+      <input bindinput="bindIdN" placeholder="(选填)" value="{{idNo}}"></input>
+    </view>
+    <view class="item">
+      <text>身份证住址</text> 
+      <view bindtap="chooseLocation" data-index="0" class="ellipsis" style="width: {{screenWidth-150}}px">
+        {{idcardLocation ? idcardLocation:'(选填)选择地址'}}
+      </view>
+    </view>
+    <view>
+      <text>* 当前住址是否与身份证地址一致？ </text>
+      <radio-group bindchange="checkboxChange" style="display: flex;flex-direction: column;"> 
+        <label class="checkbox" style="padding: 10rpx;">
+          <radio value="y">是</radio>
+        </label>
+        <label class="checkbox" style="padding: 10rpx;">
+          <radio value="n">否</radio>
+        </label>
+      </radio-group>
+    </view>
+   
+    <view class="item" wx:if="{{!sameLocation}}">
+      <text>当前住址</text> 
+      <view bindtap="chooseLocation" data-index="1"  class="ellipsis" style="width: {{screenWidth-150}}px">
+        {{currentLocation ? currentLocation: '(选填)选择地址'}}
+      </view>
+    </view>
+    <view>
+      <view style="height: 100rpx;line-height: 100rpx;text-align: center;font-size: 36rpx;">以下信息只需学生填写</view>
+    </view>
+    <view class="item pos">
+      <view>所在学校全称</view>
+      <input wx:if="{{showUInput}}" bindinput="bindUniv" value="{{univ}}" placeholder="(选填)请填写大学全称"></input>
+      <picker value="{{univ}}" range="{{univs}}" bindchange="bindUnivChange" class="picker">
+        <view class="picker-view">
+          <view wx:if="{{!showUInput}}">{{univ ? univ : '选填'}}</view>
+          <image src="{{images.arrow}}" style="width: 40rpx; height: 40rpx"></image>
+        </view>
+      </picker>
+    </view>
+
+    <view class="item pos">
+      <view>所在学院全称</view> 
+      <input wx:if="{{showCInput}}" bindinput="bindColl" value="{{coll}}"
+        style="width: 50%"
+        placeholder="(选填)请填写学院全称"/>
+      <picker value="{{coll}}" range="{{colls}}" bindchange="bindCollChange" class="picker">
+        <view class="picker-view">
+          <view wx:if="{{!showCInput}}">{{coll ? coll : '选填'}}</view>
+          <image src="{{images.arrow}}" style="width: 40rpx; height: 40rpx"></image>
+        </view>
+      </picker>
+    </view>
+
+    <view class="item">
+      <text>学号</text> 
+      <input bindinput="bindStdID" value="{{stdID}}"></input>
+    </view>
+
+     <view>
+      <view>* 您是否愿意领取100元现金奖学金，参加以下40小时的腾讯课堂直播课？(可多选)</view>
+      <checkbox-group bindchange="bindCourseChange" style="display: flex;flex-direction: column;"> 
+        <label class="checkbox course">
+          <checkbox value="手绘设计训练" />
+          <view>手绘设计训练</view>
+        </label>
+        <label class="checkbox course">
+          <checkbox value="平面设计和用户界面设计" />
+          <view>平面设计和用户界面设计</view>
+        </label>
+        <label class="checkbox course">
+          <checkbox value="HTML5及微信小程序开发" />
+          <view>HTML5及微信小程序开发</view>
+        </label>
+        <label class="checkbox course">
+          <checkbox value="Java软件工程及游戏开发" />
+          <view>Java软件工程及游戏开发</view>
+        </label>
+        <label class="checkbox course">
+          <checkbox value="数据结构与算法" />
+          <view>数据结构与算法</view>
+        </label>
+        <label class="checkbox course">
+          <checkbox value="“蓝桥杯” 全国软件和信息技术专业人才大赛培训" />
+          <view>“蓝桥杯”全国软件和信息技术专业人才大赛培训</view>
+        </label>
+      </checkbox-group>
+    </view>
+
+    <view>
+      <view>* 如果您不使用QQ邮箱，请填写常用邮箱</view>
+      <view class="item">
+        <text>您的邮箱</text> 
+        <input bindinput="bindEmail" value="{{email ? email : QQ ? QQ + '@qq.com' : ''}}"></input>
+      </view>
+    </view>
+    
+    <view>
+      <checkbox-group bindchange="bindCommitment" style="display: flex;flex-direction: column;"> 
+        <label class="checkbox course">
+          <checkbox value="0" disabled="{{!isCheckedCourse}}"/>
+          <view>我承诺领取现金奖学金后一定会上对应的腾讯课堂直播课。</view>
+        </label>
+        <label class="checkbox course">
+          <checkbox value="1" disabled="{{!isCheckedCourse}}"/>
+          <view>我知道不履行上述承诺将损害我的个人信用，并被追究相关法律责任。</view>
+        </label>
+      </checkbox-group>
+    </view>
+
+    <view>
+    注明：开课时间在2月下旬或3月初，一个月内上完，由广州叩丁狼资深设计师/工程师授课，有班主任在线辅导，课程结束并通过考核后可发实训证书。
+    </view>
+
+    <view>
+      <checkbox-group bindchange="bindNo">
+        <label class="checkbox course">
+          <checkbox value="2" disabled="{{isCheckedCourse}}" />
+          <view>不感兴趣，不领取该奖学金。</view>
+        </label>
+      </checkbox-group>
+    </view>
+
+  </scroll-view>
+
+  <view class="footer" style="position: fixed;bottom: 40rpx;width: {{screenWidth-30}}px;height: 80rpx;">
+    <view catchtap="clickConfirm" style="width: 100%">注册</view>
+  </view>
+</view>
+
+
+<view wx:if="{{isFill}}" class="container" style="padding: 0">
+  <view class="mcontent">
+    <view style="padding: 60rpx;">
+      <image style="width: 60rpx;height: 60rpx;" src="{{images.success}}"></image>
+    </view>
+    <view style="color: rgb(15, 177, 72);font-size: 30rpx;">
+      您已注册成功，感谢您的参与！请点主页返回。
+    </view>
+  </view>
+</view>

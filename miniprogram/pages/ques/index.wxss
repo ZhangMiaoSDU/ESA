@@ -1,0 +1,63 @@
+/* pages/ques/index.wxss */
+@import "../../style/zui.wxss";
+
+page {
+  height: 100%
+}
+
+.container {
+  height: 100%;
+  padding: 0
+}
+
+.content {
+  padding: 20rpx 0;
+  height: 100%;
+}
+
+.create.btn-view {
+  width: 90%;
+  margin: auto;
+  background: #fff;
+  padding-bottom: 10rpx;
+}
+
+.lists {
+  height: 100%;
+  background: #f6f6f6;
+  padding-top: 20rpx;
+}
+
+.item {
+  height: 120rpx;
+  margin: 0 20rpx 20rpx 20rpx;
+  background: #fff;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  box-shadow: 0 6rpx 4rpx 0 #f1f1f1;
+}
+
+.share-btn {
+  /* height: ; */
+  background: initial;
+  padding: 0;
+  float: right;
+  text-align: right;
+  width: 80rpx;
+}
+
+.mask-item {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+
+.mask input {
+  margin: 0;
+  border-bottom: 0.5px solid #ddd;
+  margin-left: 10rpx;
+  flex: 2;
+  text-align: left
+}
+
+
+

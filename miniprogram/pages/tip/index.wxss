@@ -1,0 +1,8 @@
+/* pages/tip/index.wxss */
+.content {
+  background: rgba(219, 244, 224);
+  padding: 10px 20px;
+  text-align: center;
+  border-radius: 10px;
+}
+

@@ -1,0 +1,93 @@
+<!--pages/jqStat/index.wxml-->
+<view class="container">
+  <view class="content">
+    <view class="tabs tabs-width tabs-external">
+      <block wx:for="{{tabs}}" wx:key="index">
+        <view 
+          class="tabs-item {{ currentIndex == index ? 'tabs-item-active-external':'' }}" 
+          bindtap="itemClick"
+          data-index="{{index}}"
+        > 
+          {{item}}
+        </view>
+      </block>
+    </view>
+
+    <!-- 下拉按钮 -->
+    <view id="dateChosen">
+      <view class='select_box chosen-select form-control'>
+        <view class='select' catchtap='selectTap'>
+            <text class='select_text'>{{dateList[index]}}</text>
+            <image class='select_img {{selectShow&&"select_img_rotate"}}' src='../../images/pull.png'  background-size="contain"></image> 
+        </view>
+        <view class='option_box' style='height:{{selectShow?(dateList.length>5?325:dateList.length*50):0}}rpx;'>
+            <text class='option' wx:for='{{dateList}}' wx:key='this' data-index='{{index}}' catchtap='optionTap'>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <scroll-view wx:if="{{currentIndex == 0}}" class="detail" scroll-y style="height: {{windowHeight - 70}}px; width: {{screenWidth}}px">
+      
+
+      <block wx:for="{{summary}}" wx:key="index">
+        <view class="item" catchtap="showDetail" data-index="{{index}}" wx:if="{{item}}">
+          <view class="item-header">
+            <view style="margin-right: 20rpx;">序号: {{summary.length - index}}</view>
+            <view>提交时间：{{item.time}}</view>
+          </view>
+          <view class="item-body" style="{{userIndex == index && show ? 'diaplay: true' : 'display: none'}};">
+            <block wx:for="{{item.qa}}" wx:key="question" wx:for-item="questionitem">
+              <view class="item-body-item">
+                <view class="ellipsis" style="color: rgba(0,0,0,.8)">{{questionitem.question}}</view>
+                <view class="ellipsis">{{questionitem.answer}}</view>
+              </view>
+            </block>
+            <view catchtap="closeDetail" style="height:80rpx;line-height:80rpx;text-align:center;color:#3c3c3c;">收起</view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+
+    <scroll-view wx:if="{{currentIndex == 1}}" class="stat" scroll-y style="height: {{windowHeight - 40}}px; width: {{screenWidth}}px">
+      <block wx:for="{{questionDict}}" wx:key="index">
+        <view class="item">
+          <view style="margin: 10rpx 0;">{{item.content}}</view>
+          <view wx:if="{{item.type==1}}" style="color: rgb(15, 177, 72);font-size: 26rpx;"
+            bindtap="viewTable"
+            data-data="{{item.answers}}"
+            data-id="{{index}}"
+           >查看详细信息</view>
+          <view wx:if="{{item.type==0}}" style="color: rgb(15, 177, 72);font-size: 26rpx;">
+            <view catchtap="viewChart"
+              data-index="{{item.index}}"
+              data-label="{{item.options}}"
+              data-data="{{item.answers}}"
+              data-id="{{index}}"
+            >{{item.showChart?'收起':'查看频数表'}}</view>
+            <!-- <view class="chart" id="trend-chart" style="height: 200px">
+              <view style="position: relative; width: {{screenWidth - 10}}px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+                <view class="chart-container">
+                        <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ vars[item.index] }}"></ec-canvas>
+                      </view>
+              </view>  
+            </view> -->
+            <view hidden="{{!item.showChart}}">
+              <canvas hidden="{{!item.showChart}}"
+                style="width: {{screenWidth - 20}}px; height: 200px;" 
+                canvas-id="canvas{{item.index}}"></canvas>
+              <view class="addition">
+                <view style="margin: 10rpx;">标签解释：</view>
+                <block wx:for="{{item.options}}" wx:for-item="option" wx:key="index">
+                  <view class="addition-item">{{index}}: {{option}}</view>
+                </block>
+              </view>
+             </view>
+          </view>
+        </view>
+      </block>
+    </scroll-view>
+  </view>
+</view>
+
+
+

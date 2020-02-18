@@ -1,0 +1,77 @@
+<!--pages/contact/index.wxml-->
+<view class="container">
+  <view class="content" style="padding: 20rpx;">
+    <view class="">
+      <!-- <view style="padding: 10px 0;border-bottom: 1px solid #ddd;">联系方式</view> -->
+      <view>
+        <view style="font-size:28rpx">
+          <view>本小程序由山东大学张淼同学和郭亮老师维护。</view>
+          <view>欢迎您提意见和建议。</view>
+        </view>
+      </view>
+      <view class="note">
+          <view class="note-header">留 言 板</view>
+          <view class="note-content">
+            <textarea bindinput="bindNote"></textarea>
+            <view class="note-save" bindtap="saveNote">提交</view>
+          </view>
+        </view>
+    </view>
+
+    <view class="header">
+      <view style="padding: 10px 0;border-bottom: 1px solid #ddd;">中国疾病预防中心热线电话</view>
+      <view class="body">
+        12320
+        <view class="phone" bindtap="phone">
+          <image src="{{images.phone}}" style="width: 20px; height: 20px; margin-right: 10rpx"></image>
+          拨打热线
+        </view>
+      </view>
+    </view>
+    <view class="content-body">
+      <view>如果您需要联系人民网求助，请填写以下信息：</view>
+      <view class="item">
+        求助人姓名：
+        <input bindinput="bindName" value="{{name}}"></input>
+      </view>
+      <view  class="item">
+        求助人地址：
+        <input bindinput="bindLocation" value="{{location}}"></input>
+      </view>
+      <view class="item">
+        联系人姓名：
+        <input bindinput="bindcontactName" value="{{contactName}}"></input>
+      </view>
+      <view class="item">
+        联系人电话：
+        <input bindinput="bindphone" value="{{phone}}"></input>
+      </view>
+      <view class="status" style="margin: 10px">
+        求助人当前状态：
+        <radio-group bindchange="statusChange" class="radiogroup">
+          <label>
+            <radio value="确诊">确诊</radio>
+          </label>
+          <label>
+            <radio value="疑似">疑似</radio>
+          </label>
+          <label>
+            <radio value="密切接触者">密切接触者</radio>
+          </label>
+          <label>
+            <radio value="无法排除的发热">无法排除的发热</radio>
+          </label>
+        </radio-group>
+      </view>
+      <view style="margin: 10px">
+        请详细描述求助人的问题:
+        <input bindinput="bindDetail"></input>
+      </view>
+      <view class="btn-view" style="background: #fff" bindtap="submitEmail">
+        <view class="btn">提交求助</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+

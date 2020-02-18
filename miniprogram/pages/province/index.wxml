@@ -1,0 +1,99 @@
+<!--pages/province/index.wxml-->
+<view class="container">
+  <view class="tabs tabs-width tabs-external">
+    <block wx:for="{{tabs}}" wx:key="index">
+      <view 
+        class="tabs-item {{ currentIndex == index ? 'tabs-item-active-external':'' }}" 
+        bindtap="itemClick"
+        data-index="{{index}}"
+      >
+        {{item}}
+      </view>
+    </block>
+  </view>
+  <view wx:if="{{currentIndex == 0}}" style="margin-top: 20px">
+    <view class="alert alert-success core-data" style="height: 100%;text-align: center; background: None">  
+      <view>疫情数据：</view>
+      <text class="label label-warning data-confirmed">确诊</text>: {{confirmA}}
+      <text class="label label-success data-cured">治愈</text>: {{curedCountA}}
+      <text class="label label-danger data-dead">死亡</text>: {{deadCountA}}
+    </view>
+
+    <view class="chart" id="trend-chart" style="height: 200px">
+      <view style="position: relative; width: {{screenWidth - 10}}px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+        <view class="chart-container">
+        <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ eclineA }}"></ec-canvas>
+        </view>
+      </view>  
+    </view>
+ 
+    <view class="chart" id="trend-chart" style="height: 200px">
+      <view style="position: relative; width: {{screenWidth - 10}}px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+        <view class="chart-container">
+        <ec-canvas id="mychart-dom-line" canvas-id="mychart-addline" ec="{{ ecaddlineA }}"></ec-canvas>
+        </view>
+      </view>  
+    </view>
+  </view>
+  <view wx:if="{{currentIndex == 1}}">
+    <view class="alert alert-primary" style="height: 100%">
+      各地区最新疫情查询（点击选择具体地区）：
+      <view id="provinceChosen">
+        <view class='select_box chosen-select form-control'>
+          <view class='select' catchtap='selectTap'>
+              <text class='select_text'>{{provinces[index]}}</text>
+              <image class='select_img {{selectShow&&"select_img_rotate"}}' src='../../images/pull.png'  background-size="contain"></image> 
+          </view>
+          <view class='option_box' style='height:{{selectShow?(provinces.length>5?325:provinces.length*50):0}}rpx;'>
+              <text class='option' wx:for='{{provinces}}' wx:key='this' data-index='{{index}}' catchtap='optionTap'>{{item}}</text>
+          </view>
+        </view>
+
+      </view>
+    </view>
+    <view class="alert alert-success core-data" style="height: 100%;text-align: center">  
+      <view>疫情数据：</view>
+      <text class="label label-warning data-confirmed">确诊</text>: {{confirm}}
+      <text class="label label-success data-cured">治愈</text>: {{curedCount}}
+      <text class="label label-danger data-dead">死亡</text>: {{deadCount}}
+    </view>
+
+    <view class="chart" id="trend-chart" style="height: 200px">
+      <view style="position: relative; width: {{screenWidth - 10}}px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+        <view class="chart-container">
+        <ec-canvas id="mychart-dom-line" canvas-id="mychart-line" ec="{{ ecline }}"></ec-canvas>
+        </view>
+      </view>  
+    </view>
+
+    <view class="chart" id="trend-chart" style="height: 200px">
+      <view style="position: relative; width: {{screenWidth - 10}}px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+        <view class="chart-container">
+        <ec-canvas id="mychart-dom-line" canvas-id="mychart-addline" ec="{{ ecaddline }}"></ec-canvas>
+        </view>
+      </view>  
+    </view>
+
+    <view style="margin-top: 20px;">
+      <view class="table">
+        <view class="table-tr">
+          <view class="table-th" style="color: #2c2c2c; width: 20%">城市</view>
+          <view class="table-th" style="color: #f1a325; width: 20%">确诊</view>
+          <view class="table-th" style="color: #38b03f; width: 20%">治愈</view>
+          <view class="table-th" style="color: #ea644a; width: 20%">死亡</view>
+
+        </view>
+        <block wx:for="{{cities}}" wx:key="index" wx:for-item="city"> 
+          <view class="table-tr" style="{{index % 2 == 1 ? 'background: rgb(241,241,241);' : ''}}">
+            <view class="table-td">{{city.cityName}}</view>
+            <view class="table-td">{{city.confirmedCount}}</view>
+            <view class="table-td">{{city.curedCount}}</view>
+            <view class="table-td">{{city.deadCount}}</view>
+          </view>
+        </block>
+      </view>
+    </view>
+  
+  </view>
+
+</view>

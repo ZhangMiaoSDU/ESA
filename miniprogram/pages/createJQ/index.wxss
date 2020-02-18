@@ -1,0 +1,119 @@
+/* pages/createJQ/index.wxss */
+@import "../../style/zui.wxss";
+page {
+  height: 100%;
+  position: fixed
+}
+
+.heading {
+  height: 160rpx;
+  font-size: 48rpx;
+  font-weight: bold;
+  background: #fff;
+  padding: 20rpx;
+
+}
+
+.container .content {
+  height: 100%;
+  background: #f7f7f7;
+}
+
+.tobtn {
+  height: 100rpx;
+  line-height: 100rpx;
+  text-align: center;
+  margin-top: 60rpx;
+}
+
+.addQuestion {
+  background: rgba(255,177,146, .3);
+  color: #ea644a;
+}
+
+.submitJQ {
+  background: rgba(219, 244, 224);
+  color: rgb(15, 177, 72);
+}
+
+.container .content .list {
+  padding: 20rpx 0;
+}
+.container .content .list .item {
+  background: #fff;
+  padding: 20rpx 40rpx;
+  color: #3c3c3c;
+  font-size: 30rpx;
+  margin-bottom: 20rpx;
+
+}
+.container .content .list .item .input-box {
+  border: 1rpx solid #ddd;
+  margin-top: 20rpx;
+  height: 60rpx;
+}
+
+.mask .content {
+  background: #fff;
+  height: 80%;
+  width: 90%;
+  border-radius: 10rpx;
+  padding: 20rpx;
+}
+
+.mask .search-box {
+  height: 60rpx;
+  line-height: 60rpx;
+  display: flex;
+  border: 1rpx solid #ddd;
+  padding: 10rpx;
+  border-radius: 10rpx;
+}
+
+.mask .search-box image {
+  width: 46rpx;
+  height: 40rpx;
+  margin: 0 10rpx;
+}
+
+.mask .input-box {
+  display: flex;
+  line-height: 60rpx;
+  align-items: center;
+  flex: 8;
+}
+
+.mask .search-res {
+  padding-top: 20rpx;
+}
+.mask .search-item {
+  height: 80rpx;
+  padding: 20rpx 40rpx;
+  border-bottom: 1rpx solid #f7f7f7;
+  line-height: 80rpx;
+  background: rgba(219, 244, 224, .3);
+  display: flex;
+  justify-content: space-between;
+}
+
+.delete.btn-view {
+  height: 60rpx;
+  line-height: 60rpx;
+  background: #fff;
+}
+
+.delete .btn {
+  background: rgba(255,177,146, .4);
+  color: #ea644a;
+  border-radius: 0px;
+}
+
+.focus-view {
+  border: 1rpx dashed #2F7FF0;
+}
+
+.mask input {
+  margin-top: 0px;
+  text-align: left;
+  border: none
+}

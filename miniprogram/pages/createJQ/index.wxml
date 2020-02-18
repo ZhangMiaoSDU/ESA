@@ -1,0 +1,128 @@
+<!--pages/createJQ/index.wxml-->
+<view class="container">
+  <view class="navBar" style="padding-top: {{statusBarHeight}}px;height: {{navigatorH}}px; width: {{screenWidth}}px">
+    <view class="left" style="justify-content: space-between">
+      <view class="icon-back back-btn" bindtap="goBack" wx:if="{{editing}}">编辑问卷</view>
+      <view class="icon-back back-btn" bindtap="goBack" wx:else>问卷</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="content" style="margin-top: {{statusBarHeight + navigatorH}}px; height:{{screenHeight - statusBarHeight - navigatorH}}px">
+    <view class="heading">
+      <view>{{title}}</view>
+      <view wx:if="{{editing}}" catchtap="changeName" style="font-size:24rpx;margin-top:10rpx;color:#2F7FF0">点击修改</view>
+      <view  wx:if="{{editing}}" bindtap="inputList" style="font-size: 28rpx;margin: 5px 0;wxcs_style_margin: 10rpx 0;">添加应填人员名单</view>
+    </view>
+
+    <view class="list">
+      <block wx:for="{{questionsInfo}}" wx:key="index">
+        <view class="item {{currentIndex == index && editing ? 'focus-view' : ''}}" catchtap="focusIndex" data-index="{{index}}">
+          <view>{{item.content}}</view>
+          <!-- <view class="input-box" wx:if="{{item.type == 1}}"></view> -->
+          <view class="input-box" wx:if="{{item.type == 1}}">
+            <input style="height: 60rpx;line-height: 60rpx;"
+              bindinput="bindAnswer" data-id="{{item._id}}" 
+              value="{{answerInfo[item._id]}}"
+              wx:if="{{!editing}}"
+            ></input>
+          </view>
+          <view wx:if="{{item.type == 0}}">
+            <radio-group style="display: flex;flex-direction: column;" 
+              bindchange="bindAnswerS"
+              data-id="{{item._id}}"
+            >
+              <block wx:for="{{item.options}}" wx:key="index" wx:for-index="optionid" wx:for-item="option">
+                <label style="padding: 10rpx;">
+                  <radio value="{{optionid}}" disabled="{{editing}}" 
+                    checked="{{answerInfo[item._id] == optionid}}"
+                  >{{option}}</radio>
+                </label>
+              </block>
+            </radio-group>
+          </view>
+          <view data-index="{{index}}" data-id="{{item._id}}" catchtap="deleteQuestion"
+            class="delete btn-view" wx:if="{{currentIndex == index && editing}}"
+          >
+            <view class="btn">删除</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view wx:if="{{editing}}" style="display: flex;">
+      <view class="tobtn addQuestion" catchtap="addQuestionMethod" style="width: 50%;">添加题目</view>
+      <view class="tobtn submitJQ" catchtap="saveJQ" style="width: 50%;">提交</view>
+    </view>
+    <view class="tobtn submitJQ" catchtap="submitJQ" wx:else>提交</view>
+  </scroll-view>
+  
+</view>
+
+<view class="mask" wx:if="{{showMask}}" bindtap="cancelAdd">
+  <view class="content" catchtap="s">
+    <view class="search-box">
+      <view class="input-box">
+        <image src="{{images.search}}"></image>
+        <input bindinput="bindQ" style="width: 100%;padding: 10rpx;" placeholder="搜索"></input>
+      </view>
+    </view>
+    <view class="search-res">
+      <block wx:for="{{searchQs}}" wx:key="index">
+        <view class='search-item' catchtap="addtheQuestion" data-id="{{item._id}}">
+          <view style="color: #3c3c3c;">{{item.content}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>
+
+<view class="mask" wx:if="{{changeName && editing}}" bindtap="cancelChangeName">
+  <view class="mask-content" catchtap="s">
+     <view>
+      <view class="title">请输入问卷标题</view>
+      <view><input bindinput="bindJQName"></input></view>
+    </view>
+    <view class="next-btn btn" catchtap="confirm">
+      确定
+    </view>
+  </view>
+</view>
+
+
+<view class="mask" wx:if="{{inputList  && editing }}">
+  <view class="mask-content" style="height: 80%;">
+    <view class="table" wx:if="{{!unfilled && !filled}}">
+      <view class="table-tr" style="background: rgb(241,241,241);">
+        <view class="table-th" style="color: #2c2c2c; width:none">姓名</view>
+        <view class="table-th" style="color: #2c2c2c; width:none">手机号</view>
+      </view>
+    
+      <view class="table-tr">
+        <view class="table-td" style="border: none">
+          <input bindinput="addName" placeholder="示例：张三" value="{{addMemberName}}"></input>
+        </view>
+        <view class="table-td" style="border: none">
+          <input bindinput="addPhone" placeholder="示例：12345678900" value="{{addMemberPhone}}"></input>
+        </view>
+      </view>
+    </view>
+    <view style="display: flex"> 
+      <view style="flex: 1;text-align: center; color: #0FB148;" bindtap="addMember">添加当前信息</view>
+      <view style="flex: 1;text-align: center; color: #0FB148;" bindtap="complete">提交</view>
+      <view style="flex: 1;text-align: center; color: #0FB148;" bindtap="cancelAdd">取消</view>
+    </view>
+    <scroll-view scroll-y style="height:80%" >  
+      <view class="table" wx:if="{{!unfilled && !filled}}">
+      <block wx:for="{{list}}" wx:key="index">
+        <view class="table-tr">
+          <view class="table-td">{{item.name}}</view>
+          <view class="table-td">{{item.phone}}</view>
+          <view class="table-td" data-id="{{item.id}}" bindtap="deleteMember">
+            <image src="{{images._delete}}" style="width: 40rpx; height: 40rpx"></image>
+          </view>
+        </view>
+      </block>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+

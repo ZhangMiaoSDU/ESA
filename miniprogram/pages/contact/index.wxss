@@ -1,0 +1,95 @@
+/* pages/contact/index.wxss */
+.container {
+  background: #f7f7f7
+}
+.header {
+  height: 160rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 6rpx 4rpx 0 #f1f1f1;
+  padding: 20rpx;
+  margin-top: 40rpx
+}
+
+.header .phone {
+  display: flex;
+  align-items: center;
+  color: #3c3c3c;
+}
+
+.header .body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 20rpx;
+  border-radius: 20rpx;
+  color: #3c3c3c;
+
+}
+
+.content-body {
+  margin-top: 40rpx;
+  background: #fff;
+  padding: 20rpx;
+}
+
+.content-body .item {
+  display: flex;
+  margin: 20rpx;
+}
+
+.content-body input {
+  border-bottom: 1rpx solid #ddd;
+  flex: 1;
+}
+
+.radiogroup {
+  display: flex;
+  flex-direction: column;
+
+}
+
+
+label {
+  margin: 10rpx
+}
+
+.note {
+  background: #fff;
+  /* background: initial; */
+  border-radius: 10rpx 20rpx  10rpx 10rpx;
+
+}
+
+.note-header {
+  text-align: center;
+  margin-top: 20rpx;
+  font-size: 36rpx;
+  color: #fff;
+  background: rgba(15, 177, 72, .8);
+  border-radius: 10rpx 20rpx;
+  font-weight: 300;
+  padding: 10rpx 0
+}
+
+.note-content {
+  /* background: #fff; */
+  padding: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.note-content textarea {
+  height: 200rpx;
+  width: 100%;
+}
+
+.note-save {
+  text-align: right;
+  background: rgba(0,0,0,.6);
+  color: #fff;
+  padding: 4rpx 20rpx;
+  border-radius: 5px;
+  /* font-size: 24rpx; */
+}

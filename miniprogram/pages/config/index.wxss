@@ -1,0 +1,8 @@
+/* pages/config/index.wxss */
+@import "../../style/zui.wxss";
+.item {
+  height: 40px;
+  line-height: 40px;
+  margin: 0 10px;
+  border-bottom: 1px solid #ddd;
+}

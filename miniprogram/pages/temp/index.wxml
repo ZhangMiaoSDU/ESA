@@ -1,0 +1,44 @@
+<!--pages/temp/index.wxml-->
+<view>
+  <view class="list">
+    <block wx:for="{{temps}}" wx:key="index">
+      <view class="list-item">
+        <view class="item-title" style="color: rgba(244, 162, 65);">{{item.name}}</view>
+        <view style="display: flex">
+          <view catchtap="select" data-id="{{item._id}}" >选用</view>
+          <view catchtap="preview" data-id="{{item._id}}" style="color: #1296db;margin-left: 20rpx">预览</view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+
+
+<view class="mask" wx:if="{{showMask}}">
+  <scroll-view class="list" scroll-y style="height: 80%">
+    <block wx:for="{{questionsInfo}}" wx:key="index">
+      <view class="item">
+        <view>{{index + 1}}. {{item.content}}</view>
+        <view class="input-box" wx:if="{{item.type == 1}}">
+        </view>
+        <view wx:if="{{item.type == 0}}">
+          <radio-group style="display: flex;flex-direction: column;" 
+            bindchange="bindAnswerS"
+            data-id="{{item._id}}"
+          >
+            <block wx:for="{{item.options}}" wx:key="index" wx:for-index="optionid" wx:for-item="option">
+              <label style="padding: 10rpx;">
+                <radio value="{{optionid}}" disabled="{{true}}" 
+                  checked="{{answerInfo[item._id] == optionid}}"
+                >{{option}}</radio>
+              </label>
+            </block>
+          </radio-group>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+  <view style="margin: 20rpx;">
+    <image src="{{images.close}}" catchtap="closeMask" style="width: 50rpx; height: 50rpx;"></image>
+  </view>
+</view>

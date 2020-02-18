@@ -1,0 +1,38 @@
+<!--pages/detail/index.wxml-->
+<view class="container">
+  <view class="content">
+    <view class="table" wx:if="{{!unfilled && !filled}}">
+      <view class="table-tr" style="background: rgb(241,241,241);">
+        <view class="table-th" style="color: #2c2c2c; width:none">序号</view>
+        <view class="table-th" style="color: #2c2c2c; width:none">答案文本</view>
+      </view>
+      <block wx:for="{{data}}" wx:key="index" wx:for-item="answer"> 
+        <view class="table-tr" style="{{index % 2 == 1 ? '' : ''}}">
+          <view class="table-td">{{index + 1}}</view>
+          <view class="table-td">{{answer}}</view>
+        </view>
+      </block>
+    </view>
+    <!-- 显示未填写问卷人员 -->
+    <view class="table"  wx:if="{{unfilled || filled}}" style="margin-bottom: 100rpx;">
+      <view class="table-tr" style="background: rgb(241,241,241);">
+        <view class="table-th" style="color: #2c2c2c; width:none">姓名</view>
+        <view class="table-th" style="color: #2c2c2c; width:none">电话</view>
+      </view>
+      <block wx:for="{{data}}" wx:key="index"> 
+        <view class="table-tr" style="{{index % 2 == 1 ? '' : ''}}">
+          <view class="table-td">{{item.name}}</view>
+          <view bindtap="makeCall" class="table-td" data-phone="{{item.phone}}">
+            <view style="display: inline-block;vertical-align: middle;" wx:if="{{unfilled}}">
+              <image src="{{images.phone}}" style="width: 20px; height: 20px; margin-right: 10rpx"></image>
+            </view>
+            <view style="display: inline;">{{item.phone}}</view>
+          </view>
+        </view> 
+      </block>
+    </view>
+    <view wx:if="{{unfilled}}" bindtap="sendMsg" class="sendMsg">
+      <view class="sendMsg-content" style="background: #fff;">发送系统消息提醒</view>
+    </view>
+  </view>
+</view>

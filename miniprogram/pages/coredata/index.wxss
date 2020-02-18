@@ -1,0 +1,64 @@
+/* pages/coredata/index.wxss */
+@import "../../style/zui.wxss";
+page, .container, .content {
+  height: 100%
+}
+
+.container {
+  padding: 0
+}
+
+.lists {
+  height: 100%;
+  background: #f6f6f6;
+  padding-top: 10px;
+}
+
+.item {
+  height: 60px;
+  margin: 0 10px 10px 10px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 20rpx;
+  box-shadow: 0 3px 2px 0 #f1f1f1;
+}
+
+.image-view {
+  display: flex;
+  align-items: center;
+}
+
+.mask-list {
+  margin: 10rpx;
+}
+
+.mask-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f7f7f7;
+}
+
+.share-btn {
+  /* height: ; */
+  background: initial;
+  padding: 0;
+  float: right;
+  text-align: right;
+  width: 80rpx;
+  align-items: center;
+  display: flex;
+}
+
+.labeltext {
+  position: absolute;
+  background: rgb(15, 177, 72);
+  color: #fff;
+  top: 0rpx;
+  height: 30rpx;
+  font-size: 18rpx;
+  right: 0px;
+  padding: 5rpx 10rpx;
+  border-radius: 10rpx;
+  line-height: 30rpx;
+}

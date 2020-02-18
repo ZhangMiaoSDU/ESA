@@ -1,0 +1,17 @@
+{
+  "name": "timedTask",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-xlsx": "^0.15.0",
+    "nodemailer": "^6.4.2",
+    "request-promise": "^4.2.5",
+    "wx-server-sdk": "^1.8.0"
+  }
+}

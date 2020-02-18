@@ -1,0 +1,14 @@
+<!--pages/tip/index.wxml-->
+<view class="container" style="padding: 20px;">
+  <view class="content">
+    <view style="padding: 30px;">
+      <image style="width: 30px;height: 30px;" src="{{images.success}}"></image>
+    </view>
+    <view style="color: rgb(15, 177, 72);">
+      您的答卷已经提交，感谢您的参与！
+    </view>
+  </view>
+</view>
+
+
+

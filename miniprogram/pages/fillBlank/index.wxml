@@ -1,0 +1,49 @@
+<!--pages/fillBlank/index.wxml-->
+<view class="container">
+  <view class="navBar" style="padding-top: {{statusBarHeight}}px;height: {{navigatorH}}px; width: {{screenWidth}}px">
+    <view class="left" style="justify-content: space-between">
+      <view class="icon-back back-btn" bindtap="goBack">编辑题目</view>
+    </view>
+  </view>
+
+  <view class="content" style="margin-top: {{statusBarHeight + navigatorH}}px">
+    <view class="list">
+      <view class="item">
+        <view style="font-size: 15px;"><text style="color: #f00">*</text> 标题</view>
+        <view class="text">
+          <textarea placeholder="请输入标题" bindinput="bindQName"></textarea>
+        </view>
+      </view>
+      <view class="item" style="font-size: 15px;">
+        选择题目类型:
+        <radio-group bindchange="typeChange" style="display: flex;flex-direction: column;">
+          <label style="padding: 5px;">
+            <radio value="1">填空题</radio>
+          </label>
+          <label style="padding: 5px;">
+            <radio value="0">单选题</radio>
+          </label>
+        </radio-group>
+        <view wx:if="{{questionType == 0}}">
+          <view style="margin: 5px;">设置选项</view>
+          
+          <view class="options">
+            <block wx:for="{{options}}" wx:key="index">
+              <view class="option-item">
+                <view class="option-input">
+                  <input value="{{item}}" style="padding:3px 10px;" data-index="{{index}}" bindinput="bindOption"></input>
+                </view>
+                <view class="option-image" data-index="{{index}}" catchtap="deleteOption"><image style="width: 20px;height: 20px" src="{{images._delete}}"></image></view>
+              </view>
+            </block>
+          </view>
+          <view style="color: rgb(15, 177, 72);margin: 5px;" bindtap="addOption"> + 添加选项</view>
+        </view>
+      </view>
+    </view>
+    <view class='btn-view' bindtap="confirm">
+      <view class="btn">确认</view>
+    </view>
+  </view>
+  
+</view>

@@ -1,0 +1,31 @@
+/* pages/temp/index.wxss */
+.list-item {
+  margin: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,177,146, .4);
+  height: 100rpx;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  color: #0FB148
+}
+
+.mask {
+  flex-direction: column
+}
+.mask .input-box {
+  border: 1px solid #ddd;
+  height: 60rpx;
+}
+
+.mask .list {
+  background: #fff;
+  padding: 40rpx;
+  width: 80%
+}
+
+.mask .list .item {
+  margin: 25rpx 0;
+
+}

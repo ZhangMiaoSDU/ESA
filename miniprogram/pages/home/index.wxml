@@ -1,0 +1,85 @@
+<!--pages/home/index.wxml-->
+<view class="container">
+  <view class="menu">
+    <view class="list">
+      <view class="item" bindtap="bindreport" data-index="{{0}}">
+        <view class="img">
+          <image src="{{images.report}}"></image>
+        </view>
+        <view class="text">查看报表</view>
+      </view>
+      <view class="item" bindtap="bindreport" data-index="{{1}}">
+        <view class="img">
+          <image src="{{images.createQ}}"></image>
+        </view>
+        <view class="text" style="color: rgba(15, 177, 72, .8)">创建调查</view>
+      </view>
+      <view class="item" bindtap="bindreport" data-index="{{2}}">
+        <view class="img">
+          <image src="{{images.fillForm}}"></image>
+        </view>
+        <view class="text" style="color: rgba(47, 127, 240, .8);">填写表格</view>
+      </view>
+    </view>
+  </view>
+  <view class="tabs tabs-width tabs-external">
+    <block wx:for="{{tabs}}" wx:key="index">
+      <view 
+        class="tabs-item {{ currentIndex == index ? 'tabs-item-active-external':'' }}" 
+        bindtap="itemClick"
+        data-index="{{index}}"
+      >
+        {{item}}
+      </view>
+    </block>
+  </view>
+  <scroll-view scroll-y="{{true}}" class="news" 
+    style="height: {{windowHeight-170}}px; " bindscroll="innerScroll" wx:if="{{currentIndex == 0}}">
+    <!-- <view style="font-weight: bold">咨讯</view> width:{{screenWidth - 20}}px-->
+    <view class="items">
+      <block wx:for="{{news}}" wx:key="index">
+        <view class="item">
+          <view class="item-heading">
+            <view class="pull-right label label-success news-province">{{item.provinceName}}</view>
+            <view class="h4 news-title">{{item.title}}</view>
+          </view>
+          <view class="item-content news-detail">  {{item.summary}}</view>
+          <view class="item-footer">
+            <text class="text-muted">{{item.infoSource}} </text>
+            <text class="text-muted news-time"> {{item.time}}</text> 
+          </view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+  <scroll-view scroll-y="{{true}}" style="height: {{windowHeight-180}}px; " class="rumors" wx:if="{{currentIndex == 1}}">
+    <!-- <view style="font-weight: bold">辟谣</view> -->
+    <view class="items">
+      <block wx:for="{{rumors}}" wx:key="index">
+        <view class="item">
+          <view class="item-heading">
+            <view class="pull-right label label-success news-province">谣言</view>
+            <view class="h4 news-title">{{item.title}}</view>
+          </view>
+          <view class="item-content news-detail" style="font-size: 12px;">
+            <view style="color:#ff9a1f;font-weight: bolder">{{item.mainSummary}}</view>
+            <view style="color: #2a3c4a;">详情：{{item.body}}</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </scroll-view>
+</view>
+
+
+<view class="mask" bindtap="cancelMask" wx:if="{{showMask}}">
+   <view class="mask-content" catchtap="s">
+    <view>
+      <view class="title">请输入表格编号</view>
+      <view><input bindinput="bindQName"></input></view>
+    </view>
+    <view class="next-btn btn" catchtap="toJQ">
+      进入表格
+    </view>
+  </view>
+</view>

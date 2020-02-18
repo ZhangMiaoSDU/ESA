@@ -1,0 +1,25 @@
+<!--index.wxml-->
+<view class="container index" style="height:100%">
+  <view>
+    <view class="title">
+      <view>疫情地图<text style="font-size: 24rpx;">(确诊病例)</text></view>
+      <view class="update-time">数据更新至 {{updateTime}}</view>
+    </view>
+    <view class="alert alert-success core-data" style="">  
+      <view>疫情数据：</view>
+      <text class="label label-warning data-confirmed">确诊</text>: {{confirm}}
+      <text class="label label-success data-cured">治愈</text>: {{curedCount}}
+      <text class="label label-danger data-dead">死亡</text>: {{deadCount}}
+    </view>
+  </view>
+  <view style="height:60%">
+    <ec-canvas id="mychart-dom-line" canvas-id="mychart-geo" ec="{{ ecgeo }}"></ec-canvas>
+  </view>
+  <view style="width: {{screenWidth - 30}}px;box-sizing: border-box;display: flex;position: fixed;bottom: 20px">
+    <button class="index-btn-view" open-type="getUserInfo" bindgetuserinfo="wechatLog">
+      <text style="font-weight: 400;">微信登录</text>
+    </button>
+  </view>
+</view>
+
+
