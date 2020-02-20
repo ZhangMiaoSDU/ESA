@@ -43,23 +43,28 @@ Page({
     currentDay: timestampToTime(new Date().getTime()).split('-').join('/'),
     statusBarHeight: app.globalData.statusBarHeight,
     navigatorH: app.globalData.navigatorH,
-    screenWidth: app.globalData.screenWidth
+    screenWidth: app.globalData.screenWidth,
+    windowHeight: app.globalData.windowHeight
   },
 
   onLoad: function (options) {
     let _this = this
-    this.loadJQ().then(res => {
+    this.loadJQ(app.globalData.openid).then(res => {
       let jqs = res.result ? res.result.data : [];
       jqs.map(item => { return item.filled = item[_this.data.currentDay] ? item[_this.data.currentDay].length : 0, item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0 })
       _this.setData({ jqs: jqs });
       console.log(this.data.jqs)
     })
+
+    // 查看
   },
 
-  loadJQ() {
-    // 由该用户创建的问卷
-    let userId = app.globalData.openid;
+  loadJQ(userId) {
     console.log("userId: ", userId)
+    // 由该用户创建的问卷
+    // let userId = app.globalData.openid;
+    // let userId = "ogesF5sRy3mAxrLAVJ1fqe8yuseU";
+
     return new Promise((resolve, reject) => {
       wx.cloud.callFunction({
         name: 'queryDB',
@@ -73,13 +78,14 @@ Page({
       }).catch(res => { console.log(res); reject(res) })
     })
   },
-
+ 
   downloadData(e) {
     wx.showLoading({
       title: '正在生成数据',
     })
     console.log("downloadData: ", e)
     let jqid = e.currentTarget.dataset.id;
+    // let jqid = '8d65afde5e4ba1d90064636c007454a2';
     let _this = this;
     var jqsInfo = this.data.jqs;
     var currentjqInfo = jqsInfo.filter(item => {return item._id == jqid})[0];
@@ -111,35 +117,58 @@ Page({
     }
     _this.setData({ dateList: dateList });
     console.log(startiso, endiso, '\n', dateList)
-    let jqUser = currentjqInfo.jqUser;
-    this.loadQuestion(currentjqInfo.questions).then(res => {
-      
-      let questionsInfo = res.map(item => { return item.data });
-      // console.log("questionsInfo: ", questionsInfo);
-      let summaryDict = _this.formatData(questionsInfo, jqUser, currentjqInfo, dateList);
-      // console.log("summaryDict: ", JSON.stringify(summaryDict));
+    let jqUser = currentjqInfo.jqUser || [];
+    let jqQuestions = currentjqInfo.questions || [];//该问卷的所有id
+    let jqQuestionsName = currentjqInfo.questionsName || []; //该问卷的所有问题的信息
+    console.log(jqQuestionsName);
+    _this.setData({ jqQuestionsName: jqQuestionsName })
+    // 根据id，查询
+    let questionsInfo = jqQuestionsName.filter(item => {
+      let _qid = Object.keys(item)[0];//问题的id
+      if (jqQuestions.indexOf(_qid) != -1) {
+        console.log("downloadData =======>  问卷中有该问题");
+        return item;
+      }
+    }).map(item => {
+      let _qid = Object.keys(item)[0];//问题的id
+      return item[_qid]
+    })
+    console.log("downloadData =======>  questionsInfo: ", questionsInfo);
+    let tasksUser = [];
+    for (let i = 0; i < jqUser.length; i++) {
+      tasksUser.push(userDB.doc(jqUser[i]).get())
+    }
+    Promise.all(tasksUser).then(usersRes => {
+      console.log(usersRes)
+      let usersInfo = usersRes.map(item => { return item.data });
+      console.log("usersInfo: ", usersInfo);
+      let summaryDict = _this.formatData(questionsInfo, usersInfo, currentjqInfo, dateList);
+      console.log("downloadData =======>  summaryDict: ", JSON.stringify(summaryDict));
       wx.cloud.callFunction({
-          name: 'excel',
-          data: {
-            name: `${jqid}/${currentjqInfo.name}`,
-            summaryDict: summaryDict
-          }
-        }).then(res => {
-          console.log(res);
-          wx.showLoading({
-            title: '获取下载链接',
-          })
-          _this.getFileUrl(res.result.fileID)
-        }).catch(res => {
-          console.log(res)
+        name: 'excel',
+        data: {
+          name: `${jqid}/${currentjqInfo.name}`,
+          summaryDict: summaryDict
+        }
+      }).then(res => {
+        console.log(res);
+        wx.showLoading({
+          title: '获取下载链接',
         })
-    }).catch(res => {console.log(res)})
-  },
+        _this.getFileUrl(res.result.fileID)
+      }).catch(res => {
+        console.log(res)
+      })
+    })
+  }, 
 
-  formatData(questionsInfo, jqUser, currentjqInfo, dateList) {
+  formatData(questionsInfo, usersInfo, currentjqInfo, dateList) {
     let questionDict = {};
     let header = [];
     header.push('用户');
+    header.push('学号');
+    header.push('所在学院');
+    header.push('所在班级');
     console.log("questionsInfo: ", questionsInfo);
     questionsInfo.map(item => {
       questionDict[item._id] = {content:item.content, type:item.type, options:item.options ? item.options:[]};
@@ -151,24 +180,30 @@ Page({
       let date = dateList[i];
       let allUsersSummary = []
       allUsersSummary.push(header);
-      jqUser.map(userId => {
-        let userAnswer = currentjqInfo[userId][date] || {};
+      usersInfo.map(userInfo => {
+        let userId = userInfo._id;
+        let userAnswer = currentjqInfo[userId][date];
         let _array = [];
-        _array.push(userId);
-        for (let key in questionDict) {
-          if (userAnswer[key]) {
-            if (questionDict[key].type == 1) {
-              _array.push(userAnswer[key])
+        if (userAnswer) {
+          _array.push(userId);
+          _array.push(userInfo.stdID);
+          _array.push(userInfo.coll);
+          _array.push(userInfo._class);
+          for (let key in questionDict) {
+            if (userAnswer[key]) {
+              if (questionDict[key].type == 1) {
+                _array.push(userAnswer[key])
+              } else {
+                var index = userAnswer[key];
+                _array.push(questionDict[key].options[index])
+              }
             } else {
-              var index = userAnswer[key];
-              _array.push(questionDict[key].options[index])
+              _array.push("未填写")
             }
-          } else {
-            _array.push("未填写")
           }
+          // console.log(_array)
+          allUsersSummary.push(_array);
         }
-        // console.log(_array)
-        allUsersSummary.push(_array);
       })
       // console.log("allUsersSummary: ", allUsersSummary);
       summaryDict.push({
@@ -179,14 +214,6 @@ Page({
     return summaryDict;
   },
 
-  loadQuestion(questions) {
-    let jqQuestions = questions || [];
-    let tasks = jqQuestions.map(item => { return questionDB.doc(item).get() });
-    return new Promise((resolve, reject) => {
-      Promise.all(tasks).then(res => {resolve(res)})
-      .catch(res => {console.log(res)})
-    })
-  },
   //获取云存储文件下载地址，这个地址有效期一天
   getFileUrl(fileID) {
     let that = this;
@@ -227,6 +254,7 @@ Page({
 
   getJQDetail(e) {
     let jqid = e.currentTarget.dataset.id;
+    // let jqid = 'fb16f7905e4e896b0198a1167f08b1a7';
     let num = e.currentTarget.dataset.num;
     console.log(e)
     app.globalData.num = num;

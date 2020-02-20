@@ -17,10 +17,15 @@
     <view class="list">
       <block wx:for="{{questionsInfo}}" wx:key="index">
         <view class="item {{currentIndex == index && editing ? 'focus-view' : ''}}" catchtap="focusIndex" data-index="{{index}}">
-          <view>{{item.content}}</view>
+          <view>
+            {{item.content}}
+            <text style="font-size: 25rpx;margin: 0 8px;margin: 0 15rpx;color: #FF4500;">{{item.isRequired ? '必答':'非必答'}}</text>
+          </view>
           <!-- <view class="input-box" wx:if="{{item.type == 1}}"></view> -->
           <view class="input-box" wx:if="{{item.type == 1}}">
+            <text style="color: #696969;" wx:if="{{editing}}">{{item.placeholder}}</text>
             <input style="height: 60rpx;line-height: 60rpx;"
+              placeholder="{{item.placeholder}}"
               bindinput="bindAnswer" data-id="{{item._id}}" 
               value="{{answerInfo[item._id]}}"
               wx:if="{{!editing}}"
@@ -40,15 +45,15 @@
               </block>
             </radio-group>
           </view>
-          <view data-index="{{index}}" data-id="{{item._id}}" catchtap="deleteQuestion"
-            class="delete btn-view" wx:if="{{currentIndex == index && editing}}"
-          >
-            <view class="btn">删除</view>
+          <view class="delete btn-view" wx:if="{{currentIndex == index && editing}}" data-index="{{index}}" >
+            <view class="btn" style="flex:1" catchtap="deleteQuestion" data-index="{{index}}" data-id="{{item._id}}">删除</view>
+            <view class='btn' style="flex: 1;background: rgba(47,127,240, .4);color: #2F7FF0;" catchtap="modifyQuestion"
+             data-index="{{index}}" data-item="{{item}}">修改</view>
           </view>
         </view>
       </block>
     </view>
-    <view wx:if="{{editing}}" style="display: flex;">
+    <view wx:if="{{editing}}" style="display: flex;" class="footer">
       <view class="tobtn addQuestion" catchtap="addQuestionMethod" style="width: 50%;">添加题目</view>
       <view class="tobtn submitJQ" catchtap="saveJQ" style="width: 50%;">提交</view>
     </view>
@@ -57,18 +62,20 @@
   
 </view>
 
-<view class="mask" wx:if="{{showMask}}" bindtap="cancelAdd">
+<view class="mask" wx:if="{{showMask}}" bindtap="cancelAddFromDB" style="background: rgba(0,0,0,.3);">
   <view class="content" catchtap="s">
     <view class="search-box">
       <view class="input-box">
         <image src="{{images.search}}"></image>
-        <input bindinput="bindQ" style="width: 100%;padding: 10rpx;" placeholder="搜索"></input>
+        <input bindinput="bindQ" style="flex: 1;padding: 10rpx; " placeholder="搜索"></input>
+        <text class="cancelSearch" catchtap="cancelSearch">取消</text>
       </view>
     </view>
     <view class="search-res">
       <block wx:for="{{searchQs}}" wx:key="index">
-        <view class='search-item' catchtap="addtheQuestion" data-id="{{item._id}}">
+        <view class='search-item' catchtap="addtheQuestion" data-id="{{item._id}}" data-name="{{item.content}}" data-item="{{item}}">
           <view style="color: #3c3c3c;">{{item.content}}</view>
+          <view style="color: #3c3c3c;">{{item.type==1 ? "填空题": "选择题"}}</view>
         </view>
       </block>
     </view>
@@ -79,14 +86,13 @@
   <view class="mask-content" catchtap="s">
      <view>
       <view class="title">请输入问卷标题</view>
-      <view><input bindinput="bindJQName"></input></view>
+      <view><input bindinput="bindJQName" style="border-bottom:1rpx solid #ddd;text-align: center;"></input></view>
     </view>
     <view class="next-btn btn" catchtap="confirm">
       确定
     </view>
   </view>
 </view>
-
 
 <view class="mask" wx:if="{{inputList  && editing }}">
   <view class="mask-content" style="height: 80%;">

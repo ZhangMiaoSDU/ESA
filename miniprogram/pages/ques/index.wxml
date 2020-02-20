@@ -7,9 +7,9 @@
   </view>
   <view class="content" style="margin-top:{{statusBarHeight + navigatorH}}px">
     <view class="create btn-view" bindtap="createJQ">
-      <view class="btn">创建问卷</view>
+      <view class="btn" style="border-radius: 50rpx">创建问卷</view>
     </view>
-    <view class="lists">
+    <scroll-view scroll-y style="height:{{windowHeight-60}}px" class="lists">
       <block wx:for="{{jqs}}" wx:key="index">
         <view class="item" bindtap="toJQ" data-name="{{item.name}}" data-id="{{item._id}}">
           <view class="detail">
@@ -17,10 +17,10 @@
               <view>{{item.name}}</view>
               <view style="font-size: 24rpx;">ID:
                 <text selectable="{{true}}">{{item.creationTime}}</text>
-                <!-- <text>长按复制此ID</text> -->
+                <text class='copyText' catchtap="copyText" data-id="{{item.creationTime}}">复制此ID</text>
               </view>
             </view>
-            <view catchtap="s" style="text-align: right;margin-top: 20rpx;">
+            <view catchtap="s" style="text-align: right;margin-top: 20rpx; float: right;">
               <button class="share-btn" style="width:80rpx;" open-type="share" data-jqid="{{item._id}}" data-name="{{item.name}}">
                 <image src="{{images.share}}" style="width: 40rpx; height: 40rpx"></image>
               </button>
@@ -30,25 +30,37 @@
           </view>
         </view>
       </block>
-    </view>
+    </scroll-view>
   </view>
 </view>
 
 <view class="mask" bindtap="cancelCreate" wx:if="{{showMask}}">
-  <view class="mask-content" catchtap="s">
+  <view class="mask-content" catchtap="s" style="font-size: 28rpx;">
     <view>
       <view class="title">问卷信息</view>
       <view class="mask-item"> 
-        <view style="flex: 1;">问卷名称</view>
+        <view style="flex: 3;">问卷名称</view>
         <input bindinput="bindQName"></input>
       </view>
       <view  class="mask-item">
-        <view style="flex: 1;">创建者邮箱</view>
+        <view style="flex: 3;">创建者邮箱</view>
         <input bindinput="bindEmail" value="{{email}}"></input>
       </view>
-      <view  class="mask-item">
-        <view style="flex: 1;">上级/备份邮箱</view>
+      <view class="mask-item">
+        <view style="flex: 3;">上级/备份邮箱1</view>
         <input bindinput="bindsecEmail" placeholder="(选填)" value="{{secEmail}}"></input>
+      </view>
+      <view class="mask-item">
+        <view style="flex: 3;">上级/备份手机号1</view>
+        <input bindinput="bindsecPhone" placeholder="(选填)" value="{{secPhone}}"></input>
+      </view>
+      <view class="mask-item">
+        <view style="flex: 3;">上级/备份邮箱2</view>
+        <input bindinput="bind3rdEmail" placeholder="(选填)" value="{{_3rdEmail}}"></input>
+      </view>
+      <view class="mask-item">
+        <view style="flex: 3;">上级/备份手机号2</view>
+        <input bindinput="bind3rdPhone" placeholder="(选填)" value="{{_3rdPhone}}"></input>
       </view>
       <!-- <text>可上传txt文件，查看示例</text> -->
       <view class="mask-item" style="flex-direction: column;">
@@ -67,7 +79,7 @@
       </view>
       
       <view  class="mask-item">
-        <view style="flex: 1;">应填人数(选填)</view>
+        <view style="flex: 3;">应填人数(选填)</view>
         <input bindinput="bindNum" style="text-align: center" value="{{number}}人"></input>
       </view>
     </view>
@@ -79,7 +91,7 @@
 
 
 <view class="mask" wx:if="{{inputList}}">
-  <view class="mask-content" style="height: 80%;">
+  <view class="mask-content" style="height: 80%; width: 85%; font-size: 28rpx;">
     <view class="table" wx:if="{{!unfilled && !filled}}">
       <view class="table-tr" style="background: rgb(241,241,241);">
         <view class="table-th" style="color: #2c2c2c; width:none">姓名</view>

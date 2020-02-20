@@ -1,11 +1,12 @@
 /* pages/send/index.wxss */
 page {
-  background: #f7f7f7
+  background: #f7f7f7;
+  position: fixed;
 }
 
 .list {
   background: #fff;
-  margin: 10rpx 15rpx;
+  /* margin: 10rpx 15rpx; */
 }
 
 .item {
@@ -35,9 +36,10 @@ page {
   border-radius: 30rpx;
 }
 .search-box image {
-  width: 46rpx;
+  width: 40rpx;
   height: 40rpx;
   margin: 0 10rpx;
+  font-size: 28rpx;
 }
 
 .input-box {
@@ -45,6 +47,9 @@ page {
   line-height: 60rpx;
   align-items: center;
   flex: 8;
+  border: 1rpx solid #ddd;
+  border-radius: 30rpx;
+  font-size: 26rpx
 }
 
 .search-res {

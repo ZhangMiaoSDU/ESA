@@ -6,8 +6,17 @@ cloud.init({env: 'esa'})
 const db = cloud.database();
 // 云函数入口函数
 exports.main = async (event, context) => {
-  const execTasks = []; // 待执行任务栈
-  const sendEmailTasks = []; //需要发送邮件的任务栈
+  const execTasks = [
+   
+  ]; // 待执行任务栈
+  const sendEmailTasks = [
+    // {
+    //   _id: '',
+    //   jqid: "f5f6a9235e4c9fd100be0a6a3adeb5f3",
+    //   mail: "2549360836@qq.com",
+    //   name: "Q1",
+    // }
+  ]; //需要发送邮件的任务栈
   const deletTasks = []; //需要删除的任务栈
   // 1.查询是否有定时任务。（timeingTask)集合是否有数据。
   let taskRes = await db.collection(COLLECTIONNAME).limit(100).get()
@@ -91,12 +100,12 @@ exports.main = async (event, context) => {
   }
   // 处理需要发送邮件的任务
   for (let i = 0; i < sendEmailTasks.length; i++) {
-    let task = sendEmailTasks[i];
+    let task = sendEmailTasks[0];
     const sendEmail = require('sendEmail.js')
     try {
       // console.log(sendEmailTasks) 
       await sendEmail.sendEmail(task.jqid, task.name, task.mail)
-      if (task.secEmail.trim() != '') {
+      if (task.secEmail && task.secEmail.trim() != '') {
         await sendEmail.sendEmail(task.jqid, task.name, task.secEmail)
       }
     } catch (e) {

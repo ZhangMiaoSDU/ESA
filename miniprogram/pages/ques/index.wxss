@@ -2,7 +2,7 @@
 @import "../../style/zui.wxss";
 
 page {
-  height: 100%
+  position: fixed
 }
 
 .container {
@@ -55,8 +55,16 @@ page {
   margin: 0;
   border-bottom: 0.5px solid #ddd;
   margin-left: 10rpx;
-  flex: 2;
+  flex: 5;
   text-align: left
+}
+
+.copyText {
+  background: #0FB148;
+  color: #fff;
+  padding: 5rpx 15rpx;
+  border-radius: 10rpx;
+  margin-left: 10rpx;
 }
 
 

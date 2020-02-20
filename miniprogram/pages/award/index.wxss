@@ -92,10 +92,11 @@ page {
 }
 
 .mcontent {
-  background: rgba(219, 244, 224);
+  background: rgba(219, 244, 224, .4);
+  height: 100%;
   padding: 20rpx 40rpx;
   text-align: center;
-  border-radius: 20rpx;
+  border-radius: 0rpx;
 }
 
 
@@ -118,4 +119,10 @@ page {
 
 .course.checkbox {
   padding: 10rpx;
+}
+
+.tip.container {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
 }

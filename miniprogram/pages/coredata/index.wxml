@@ -7,7 +7,7 @@
   </view>
   <view class="content" style="margin-top:{{statusBarHeight + navigatorH}}px">  
     <!-- <view bindtap="loadJQ">query</view> -->
-    <scroll-view scroll-y style="height: 100%" class="lists">
+    <scroll-view scroll-y style="height: {{windowHeight}}px" class="lists">
       <block wx:for="{{jqs}}" wx:key="index">
         <view class="item" style="position: relative;">
           <view class="labeltext">{{item.type == 0 ? '一次性' : item.type == 1 ? '按月' : '按日'}}</view>

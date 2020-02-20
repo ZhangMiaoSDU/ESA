@@ -1,9 +1,9 @@
 <!--pages/province/index.wxml-->
-<view class="container">
+<view class="container" style="height: {{windowHeight - 60}}px">
   <view class="tabs tabs-width tabs-external">
     <block wx:for="{{tabs}}" wx:key="index">
       <view 
-        class="tabs-item {{ currentIndex == index ? 'tabs-item-active-external':'' }}" 
+        class="tabs-item {{ currentIndex == index ? '':'tabs-item-active-external' }}" 
         bindtap="itemClick"
         data-index="{{index}}"
       >
@@ -11,8 +11,8 @@
       </view>
     </block>
   </view>
-  <view wx:if="{{currentIndex == 0}}" style="margin-top: 20px">
-    <view class="alert alert-success core-data" style="height: 100%;text-align: center; background: None">  
+  <scroll-view scroll-y style="height:{{windowHeight - 110}}px" wx:if="{{currentIndex == 0}}">
+    <view class="alert alert-success core-data" style="text-align: center; background: None">  
       <view>疫情数据：</view>
       <text class="label label-warning data-confirmed">确诊</text>: {{confirmA}}
       <text class="label label-success data-cured">治愈</text>: {{curedCountA}}
@@ -34,9 +34,9 @@
         </view>
       </view>  
     </view>
-  </view>
-  <view wx:if="{{currentIndex == 1}}">
-    <view class="alert alert-primary" style="height: 100%">
+  </scroll-view>
+  <scroll-view scroll-y style="height:{{windowHeight - 110}}px" wx:if="{{currentIndex == 1}}">
+    <view class="alert alert-primary" >
       各地区最新疫情查询（点击选择具体地区）：
       <view id="provinceChosen">
         <view class='select_box chosen-select form-control'>
@@ -51,7 +51,7 @@
 
       </view>
     </view>
-    <view class="alert alert-success core-data" style="height: 100%;text-align: center">  
+    <view class="alert alert-success core-data" style="text-align: center">  
       <view>疫情数据：</view>
       <text class="label label-warning data-confirmed">确诊</text>: {{confirm}}
       <text class="label label-success data-cured">治愈</text>: {{curedCount}}
@@ -74,7 +74,7 @@
       </view>  
     </view>
 
-    <view style="margin-top: 20px;">
+    <view style="margin-top: 20px; background: #fff;">
       <view class="table">
         <view class="table-tr">
           <view class="table-th" style="color: #2c2c2c; width: 20%">城市</view>
@@ -94,6 +94,6 @@
       </view>
     </view>
   
-  </view>
+  </scroll-view>
 
 </view>

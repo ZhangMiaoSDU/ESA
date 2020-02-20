@@ -64,9 +64,48 @@ exports.main = async (event, context) => {
     // 计算需分几次取
     const batchTimes = Math.ceil(total / 100)
     // 承载所有读操作的 promise 的数组
+    /*
+    _.or([
+  {
+    progress: _.gt(80)
+  },
+  {
+    done: true
+  }
+])
+    */
     const tasks = []
     for (let i = 0; i < batchTimes; i++) {
-      const promise = jqDB.where({ creator: event.userId })
+      const promise = jqDB.where(_.or([
+        { creator: _.eq(event.userId)},
+        { secCreator: _.eq(event.userId)},
+        { _3rdCreator: _.eq(event.userId)}
+      ]))
+        .skip(i * MAX_LIMIT).limit(MAX_LIMIT).get()
+      tasks.push(promise)
+    }
+    console.log(tasks)
+    if (tasks.length > 0) {
+      // 等待所有
+      return (await Promise.all(tasks)).reduce((acc, cur) => {
+        return {
+          data: acc.data.concat(cur.data),
+          errMsg: acc.errMsg,
+        }
+      })
+    } else {
+      return;
+    }
+  } else if (event.querySecJQ) {
+    // 先取出集合记录总数
+    const countResult = await jqDB.count()
+    const total = countResult.total
+    // 计算需分几次取
+    const batchTimes = Math.ceil(total / 100)
+    // 承载所有读操作的 promise 的数组
+    const tasks = []
+    for (let i = 0; i < batchTimes; i++) {
+      const promise = jqDB.where({ secCreator: event.userId })
         .skip(i * MAX_LIMIT).limit(MAX_LIMIT).get()
       tasks.push(promise)
     }

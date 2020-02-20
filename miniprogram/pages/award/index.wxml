@@ -9,32 +9,40 @@
     </view>
     <view class="item">
       <text>姓名</text>
-      <input bindinput="bindName" value="{{name}}"></input>
+      <input bindinput="bindName" placeholder="必填" value="{{name}}"></input>
     </view>
     <view class="item">
       <text>性别</text> 
-      <input bindinput="bindSex" placeholder="(选填)" value="{{sex}}"></input>
+      <input bindinput="bindSex" placeholder="选填" value="{{sex}}"></input>
     </view>
     <view class="item">
       <text>民族</text> 
-      <input bindinput="bindNation" placeholder="(选填)"value="{{nation}}"></input>
+      <input bindinput="bindNation" placeholder="选填"value="{{nation}}"></input>
     </view>
     <view class="item">
       <text>出生日期</text> 
-      <input bindinput="bindBirth" value="{{brith}}" placeholder="（选填）格式：20190101"></input>
+      <input bindinput="bindBirth" value="{{brith}}" placeholder="选填 格式：20190101"></input>
     </view>
     <view class="item">
       <text>QQ</text> 
-      <input bindinput="bindQQ" placeholder="(选填)" value="{{QQ}}"></input>
+      <input bindinput="bindQQ" placeholder="选填" value="{{QQ}}"></input>
+    </view>
+    <view>
+      <view>* 如果您不使用QQ邮箱，请填写常用邮箱</view>
+      <view class="item">
+        <text>您的邮箱</text> 
+        <input bindinput="bindEmail" placeholder="选填" value="{{email ? email : QQ ? QQ + '@qq.com' : ''}}"></input>
+      </view>
     </view>
     <view class="item">
       <text>手机号码</text> 
-      <input bindinput="bindP" value="{{phone}}"></input>
+      <input bindinput="bindP" placeholder="必填" value="{{phone}}"></input>
     </view>
     <view class="item">
       <text>身份证号码</text> 
-      <input bindinput="bindIdN" placeholder="(选填)" value="{{idNo}}"></input>
+      <input bindinput="bindIdN" placeholder="选填" value="{{idNo}}"></input>
     </view>
+    <!--     
     <view class="item">
       <text>身份证住址</text> 
       <view bindtap="chooseLocation" data-index="0" class="ellipsis" style="width: {{screenWidth-150}}px">
@@ -52,22 +60,22 @@
         </label>
       </radio-group>
     </view>
-   
-    <view class="item" wx:if="{{!sameLocation}}">
+    -->
+    <view class="item">
       <text>当前住址</text> 
       <view bindtap="chooseLocation" data-index="1"  class="ellipsis" style="width: {{screenWidth-150}}px">
-        {{currentLocation ? currentLocation: '(选填)选择地址'}}
+        {{currentLocation ? currentLocation: '(必填)选择地址'}}
       </view>
     </view>
-    <view>
+    <!-- <view>
       <view style="height: 100rpx;line-height: 100rpx;text-align: center;font-size: 36rpx;">以下信息只需学生填写</view>
-    </view>
+    </view> -->
     <view class="item pos">
       <view>所在学校全称</view>
-      <input wx:if="{{showUInput}}" bindinput="bindUniv" value="{{univ}}" placeholder="(选填)请填写大学全称"></input>
+      <input wx:if="{{showUInput}}" bindinput="bindUniv" value="{{univ}}" placeholder="(必填)请填写大学全称"></input>
       <picker value="{{univ}}" range="{{univs}}" bindchange="bindUnivChange" class="picker">
         <view class="picker-view">
-          <view wx:if="{{!showUInput}}">{{univ ? univ : '选填'}}</view>
+          <view wx:if="{{!showUInput}}">{{univ ? univ : '必填'}}</view>
           <image src="{{images.arrow}}" style="width: 40rpx; height: 40rpx"></image>
         </view>
       </picker>
@@ -77,18 +85,31 @@
       <view>所在学院全称</view> 
       <input wx:if="{{showCInput}}" bindinput="bindColl" value="{{coll}}"
         style="width: 50%"
-        placeholder="(选填)请填写学院全称"/>
+        placeholder="(必填)请填写学院全称"/>
       <picker value="{{coll}}" range="{{colls}}" bindchange="bindCollChange" class="picker">
         <view class="picker-view">
-          <view wx:if="{{!showCInput}}">{{coll ? coll : '选填'}}</view>
+          <view wx:if="{{!showCInput}}">{{coll ? coll : '必填'}}</view>
+          <image src="{{images.arrow}}" style="width: 40rpx; height: 40rpx"></image>
+        </view>
+      </picker>
+    </view>
+
+    <view class="item pos">
+      <view>所在班级</view> 
+      <input wx:if="{{showClassInput}}" bindinput="bindClass" value="{{_class}}"
+        style="width: 50%"
+        placeholder="(必填)请填写学院全称"/>
+      <picker value="{{_class}}" range="{{_classes}}" bindchange="bindClassChange" class="picker">
+        <view class="picker-view">
+          <view wx:if="{{!showClassInput}}">{{_class ? _class : '必填'}}</view>
           <image src="{{images.arrow}}" style="width: 40rpx; height: 40rpx"></image>
         </view>
       </picker>
     </view>
 
     <view class="item">
-      <text>学号</text> 
-      <input bindinput="bindStdID" value="{{stdID}}"></input>
+      <text>学号/工号</text> 
+      <input bindinput="bindStdID" placeholder="必填（若无，填写0）" value="{{stdID}}"></input>
     </view>
 
      <view>
@@ -121,13 +142,7 @@
       </checkbox-group>
     </view>
 
-    <view>
-      <view>* 如果您不使用QQ邮箱，请填写常用邮箱</view>
-      <view class="item">
-        <text>您的邮箱</text> 
-        <input bindinput="bindEmail" value="{{email ? email : QQ ? QQ + '@qq.com' : ''}}"></input>
-      </view>
-    </view>
+    
     
     <view>
       <checkbox-group bindchange="bindCommitment" style="display: flex;flex-direction: column;"> 
@@ -163,13 +178,14 @@
 </view>
 
 
-<view wx:if="{{isFill}}" class="container" style="padding: 0">
+<view wx:if="{{isFill}}" class="container tip" style=" height: {{windowHeight - 50}}px">
   <view class="mcontent">
     <view style="padding: 60rpx;">
       <image style="width: 60rpx;height: 60rpx;" src="{{images.success}}"></image>
     </view>
     <view style="color: rgb(15, 177, 72);font-size: 30rpx;">
-      您已注册成功，感谢您的参与！请点主页返回。
+      <view>您已注册成功，感谢您的参与！</view> 
+      <view style="margin: 10rpx;">您可以<text style="font-weight: 500;" catchtap="viewProfile">查看修改个人信息</text>或<text style="font-weight: 500;" catchtap="goback">返回主页</text>。</view>
     </view>
   </view>
 </view>

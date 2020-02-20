@@ -1,6 +1,8 @@
 // pages/config/index.js
 const app = getApp();
-const images = require('../../utils/images.js')
+const images = require('../../utils/images.js');
+const db = wx.cloud.database();
+const userDB = db.collection('user')
 Page({
 
   data: {
@@ -13,15 +15,35 @@ Page({
   },
 
   onLoad: function (options) {
+    console.log(options)
+    let _this = this;
     let stringJson = options.stringJson;
     let optionjson = JSON.parse(stringJson)
     this.setData({ jqName: optionjson.name, info: optionjson})
     let array = [];
     for (let i = 0; i < 31; i++) {
       array.push(i + 1)
-    }
+    } 
     console.log(array)
-    this.setData({array: array})
+    this.setData({array: array});
+    if (optionjson.secPhone == '') {
+      _this.setData({ secCreator: undefined});
+    } else {
+      userDB.where({ phone: optionjson.secPhone }).get().then(res => {
+        let secCreator = res.data[0];
+        _this.setData({ secCreator: secCreator })
+        console.log(secCreator)
+      });
+    }
+    if (optionjson._3rdPhone == '') {
+      _this.setData({ _3rdCreator: undefined });
+    } else {
+      userDB.where({ phone: optionjson._3rdPhone }).get().then(res => {
+        let _3rdCreator = res.data[0];
+        _this.setData({ _3rdCreator: _3rdCreator })
+        console.log(_3rdCreator)
+      });
+    }
   },
   bindDateChange(e) {
     console.log('picker发送选择改变，携带值为', e.detail.value);
@@ -119,11 +141,15 @@ Page({
             isoDeadLine: [isoDeadlineDate, isoDeadlineHour, isoDeadlineMinute],
             mail: this.data.info.email,
             secEmail: this.data.info.secEmail,
+            secPhone: this.data.info.secPhone,
+            _3rdEmail: this.data.info._3rdEmail,
+            _3rdPhone: this.data.info._3rdPhone,
             list: this.data.list
           }
         }
       }).then(res => {
         console.log(res)
+
         wx.hideLoading();
         wx.navigateTo({
           url: '../createJQ/index?editing=0&jq=' + this.data.jqName + '&id=' + jqid,
@@ -152,25 +178,34 @@ Page({
   addTojq() {
     let _this = this;
     let info = this.data.info;
-    console.log("info: ", info)
+    console.log("info: ", info);
+    let data = {
+      name: _this.data.jqName,
+      creationTime: new Date().getTime(),
+      creator: app.globalData.openid,
+      deadline: _this.data.deadline,
+      type: _this.data.type,
+      modeDetail: _this.data.modeDetail,
+      remodeDetail: _this.data.remodeDetail,
+      mail: info.email,
+      secEmail: info.secEmail,
+      _3rdEmail: info._3rdEmail,
+      secPhone: info.secPhone,
+      list: info.list,
+      number: info.number
+    }
+    if (this.data.secCreator) {
+      data.secCreator = this.data.secCreator._id
+    }
+    if (this.data._3rdCreator) {
+      data._3rdCreator = this.data._3rdCreator._id
+    }
     return new Promise((resolve, reject) => {
       wx.cloud.callFunction({
         name: 'addDoc',
         data: {
           addjq: true,
-          data: {
-            name: _this.data.jqName,
-            creationTime: new Date().getTime(),
-            creator: app.globalData.openid,
-            deadline: _this.data.deadline,
-            type: _this.data.type,
-            modeDetail: _this.data.modeDetail,
-            remodeDetail: _this.data.remodeDetail,
-            mail: info.mail,
-            secEmail: info.secEmail,
-            list: info.list,
-            number: info.number
-          }
+          data: data
         }
       }).then(res => {resolve(res)})
       .catch(res => {reject(res)})

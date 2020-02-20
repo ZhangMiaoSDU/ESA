@@ -390,6 +390,7 @@ function getAOption(date, confirmedNCoV, curedNCoV, deadNCoV, suspectedNCoV, tit
 
 Page({
   data: {
+    windowHeight: app.globalData.windowHeight,
     tabs: ['全国数据', '各省数据'],
     currentIndex: 0,
     region: '湖北省',

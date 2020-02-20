@@ -5,6 +5,7 @@ cloud.init({ env: 'esa'})
 
 const db = cloud.database()
 const _ = db.command
+const $ = db.command.aggregate
 const userDB = db.collection('user')
 const jqDB = db.collection('jq');
 const univcollDB = db.collection('univ-coll');
@@ -36,22 +37,52 @@ exports.main = async (event, context) => {
   } else if (event.updateJQquestion) {
     return await jqDB.doc(event.id).update({
       data: {
-        questions: _.addToSet(event.questionId)
+        questions: _.addToSet(event.questionId),
+        questionsName: _.addToSet(event.qdict)
       }
     })
   } else if (event.addMultiquestions) {
-    return await jqDB.doc(event.id).update({
+    let questionsId = event.questionsId;
+    let tasks = [];
+    for (let i = 0; i < questionsId.length; i++) {
+      tasks.push(db.collection("question").doc(questionsId[i]).get())
+    }
+    let questionsRes = await Promise.all(tasks);
+    console.log(questionsRes)
+    let questionsInfo = questionsRes.map(item => { return item.data });
+    let _dictArr = questionsInfo.map(item => { let _dict = {}; _dict[item._id] = item; return _dict; });
+    console.log("_dictArr: ", _dictArr)
+    let addquestions = await jqDB.doc(event.id).update({
       data: {
         questions: _.push({
-          each: event.questionsId,
+          each: questionsId,
           slice: event.slice
         })
       }
     })
+    let addName = await jqDB.doc(event.id).update({
+      data: {
+        questionsName: _.push({
+          each: _dictArr,
+          slice: event.slice
+        })
+      }
+    })
+    return [addquestions, addName];
   } else if (event.removeJQquestion) {
+    let res = await jqDB.doc(event.id).update({
+      data: {
+        questionsName: event.remainder
+      }
+    });
+    console.log(res);
+    if (event.modify) {
+      return;
+    }
+    let questionId = event.questionId;
     return await jqDB.doc(event.id).update({
       data: {
-        questions: _.pullAll([event.questionId])
+        questions: _.pullAll([questionId])
       }
     })
   } else if (event.updateJQSummary) {
@@ -80,6 +111,12 @@ exports.main = async (event, context) => {
     return await univcollDB.doc('COLL').update({
       data: {
         name: _.addToSet(event.coll)
+      }
+    })
+  } else if (event.addClass) {
+    return await univcollDB.doc('_CLASS').update({
+      data: {
+        name: _.addToSet(event._class)
       }
     })
   } else if (event.removejq) {

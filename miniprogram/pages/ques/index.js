@@ -5,10 +5,11 @@ const db = wx.cloud.database();
 const userDB = db.collection('user');
 const FileSystemManager = wx.getFileSystemManager();
 Page({
-  data: {
+  data: { 
     screenWidth: app.globalData.screenWidth,
     statusBarHeight: app.globalData.statusBarHeight,
     navigatorH: app.globalData.navigatorH,
+    windowHeight: app.globalData.windowHeight,
     showMask: false,
     images: images,
     list: [],
@@ -16,13 +17,23 @@ Page({
   },
 
   onLoad: function (options) {
+    wx.showLoading({
+      title: '加载中',
+    })
     userDB.doc(app.globalData.openid).get().then(res => {
       console.log(res);
+      wx.hideLoading();
       if (res.data.email) {
         this.setData({ email: res.data.email})
       } else {
         this.setData({hasMail: false})
       }
+    }).catch(res => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
     })
   },
   loadJQ() {
@@ -44,14 +55,6 @@ Page({
   },
   onShow() {
     let _this = this;
-    wx.showTabBar({
-      success: res => {
-        console.log(res);
-      },
-      fail: res => {
-        console.log(res)
-      }
-    })
     this.loadJQ().then(res => {
       let jqs = res.result ? res.result.data : [];
       jqs.map(jq => {
@@ -83,6 +86,9 @@ Page({
       name: this.data.jq,
       email: this.data.email,
       secEmail: this.data.secEmail || '',
+      secPhone: this.data.secPhone || '',
+      _3rdEmail: this.data._3rdEmail || '',
+      _3rdPhone: this.data._3rdPhone || '',
       number: this.data.number || 0,
       list: this.data.list || []
     }
@@ -120,7 +126,7 @@ Page({
     const id = e.currentTarget.dataset.id;
     const name = e.currentTarget.dataset.name;
     wx.navigateTo({
-      url: '../createJQ/index?editing=0&jq=' + name + '&id=' + id,
+      url: '../createJQ/index?editing=0&ques=0&jq=' + name + '&id=' + id,
     })
   },
   onShareAppMessage(e) {
@@ -190,7 +196,6 @@ Page({
           filePath: tempFilePath,
           encoding: 'utf-8',
           success: res => { 
-            
             // console.log(res);
             var dataArr = res.data.split("\n");
             var number = dataArr.length;
@@ -200,6 +205,7 @@ Page({
                 list.push({
                   name: dataArr[i].split('\t')[0],
                   phone: dataArr[i].split('\t')[1].trim(),
+                  id: new Date().getTime() + list.length
                 })
               }
             }
@@ -221,6 +227,19 @@ Page({
   bindsecEmail(e) {
     this.setData({ secEmail: e.detail.value})
   },
+
+  bindsecPhone(e) {
+    this.setData({ secPhone: e.detail.value })
+  },
+
+  bind3rdEmail(e) {
+    this.setData({ _3rdEmail: e.detail.value })
+  },
+
+  bind3rdPhone(e) {
+    this.setData({ _3rdPhone: e.detail.value })
+  },
+
   bindEmail(e) {
     this.setData({email: e.detail.value})
   },
@@ -254,9 +273,17 @@ Page({
       })
       return;
     }
-    
     let list = this.data.list;
-    addMemberInfo.id = count;
+    console.log(this.data.list.filter(item => { return item.phone == addMemberInfo.phone }))
+    if (this.data.list.filter(item => { return item.phone == addMemberInfo.phone}).length > 0) {
+      wx.showToast({
+        title: '手机号重复',
+        icon: 'none'
+      })
+      return;
+    }
+
+    addMemberInfo.id = new Date().getTime() + list.length;
     count = count + 1;
     this.setData({count: count})
     list.push(addMemberInfo);
@@ -270,7 +297,7 @@ Page({
   deleteMember(e) {
     let memberid = e.currentTarget.dataset.id;
     var list = this.data.list.filter(item => {return item.id != memberid});
-    this.setData({list: list})
+    this.setData({list: list, number: list.length})
     wx.showToast({
       title: `删除成功！`,
       icon: 'none'
@@ -282,5 +309,14 @@ Page({
   },
   cancelAdd() {
     this.setData({ inputList: false})
+  },
+
+  copyText(e) {
+    let id = e.currentTarget.dataset.id;
+    wx.setClipboardData({
+      data: String(id),
+      success: res => { console.log(res) },
+      fail: res => { console.log(res) }
+    });
   }
 })

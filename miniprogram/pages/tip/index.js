@@ -8,8 +8,8 @@ Page({
 
   onUnload() {
     console.log('onUnload');
-    wx.navigateBack({
-      delta: 1
+    wx.switchTab({
+      url: '../home/index',
     })
   }
 })

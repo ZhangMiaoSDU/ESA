@@ -14,7 +14,8 @@ Page({
     currentDay: timestampToTime(new Date()),
     screenWidth: app.globalData.screenWidth,
     statusBarHeight: app.globalData.statusBarHeight,
-    navigatorH: app.globalData.navigatorH
+    navigatorH: app.globalData.navigatorH,
+    windowHeight: app.globalData.windowHeight
   },
 
   onLoad: function (options) {
@@ -80,10 +81,11 @@ Page({
   fillJQ(e) {
     var id = e.currentTarget.dataset.id;
     var name = e.currentTarget.dataset.name;
+    this.setData({ resJQ: null, queryid: ''})
     wx.navigateTo({
       url: '../createJQ/index?jq=' + name + '&id=' + id
     })
-    this.setData({ resJQ: null})
+    
   },
   bindQ(e) {
     this.setData({queryid: e.detail.value})

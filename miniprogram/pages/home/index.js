@@ -6,7 +6,7 @@ const utils = require('../../utils/utils.js');
 const db = wx.cloud.database();
 const questionDB = db.collection('question');
 const jqDB = db.collection('jq');
-
+const userDB = db.collection('user');
 Page({
 
   data: {
@@ -23,15 +23,47 @@ Page({
 
   onLoad: function (options) {
     let _this = this;
+    wx.showLoading({
+      title: '加载中',
+    })
     this.initNews();
     this.initRumors();
-
+    this.loadUser();
   },
-
+  loadUser() {
+    if (app.globalData.isregister) {
+      userDB.doc(app.globalData.openid).get().then(res => {
+        console.log(res);
+        let info = res.data;
+        let flag = true;
+        let requiredInfo = {
+          name: info.name, phone: info.phone,
+          coll: info.coll, stdID: info.stdID, _class: info._class
+        };
+        Object.values(requiredInfo).map(item => { if (!item || item.trim() == '') { flag = false; } });
+        if (!flag) {
+          wx.showModal({
+            title: '提示',
+            content: '应上级要求，请补全姓名、手机号、学院、班级和学号/工号信息，建议只需填写一次，方便您以后填表，谢谢！',
+            showCancel: false,
+            success: res => {
+              wx.navigateTo({
+                url: '../profile/index',
+              })
+            }
+          })
+        }
+      }).catch(res => {
+        console.log(res)
+      })
+    }
+  
+  },
   initNews() {
     let _this = this
     wxrequest.initNews().then(res => {
       // console.log(res);
+      wx.hideLoading();
       res.map(item => { return item.time = utils.formatDate(item.pubDate) })
       _this.setData({ news: res })
     })

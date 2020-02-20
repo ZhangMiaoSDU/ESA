@@ -6,12 +6,27 @@
     </view>
   </view>
 
-  <view class="content" style="margin-top: {{statusBarHeight + navigatorH}}px">
+  <view wx:if="{{!editing}}" class="content" style="margin-top: {{statusBarHeight + navigatorH}}px">
     <view class="list">
       <view class="item">
         <view style="font-size: 15px;"><text style="color: #f00">*</text> 标题</view>
         <view class="text">
           <textarea placeholder="请输入标题" bindinput="bindQName"></textarea>
+        </view>
+      </view>
+      <view class="type">
+        <view style="display: flex;font-size: 30rpx;margin: 11px 0;wxcs_style_margin: 20rpx 0;align-items: center;">
+          <view>题目设为：</view>
+          <radio-group bindchange='bindRatio'>
+            <radio value='true'>必答</radio>
+            <radio value="false" checked="{{!questionIsRequired}}">非必答</radio>
+          </radio-group>
+        </view>
+        <view>
+          <view style="margin: 5px;">填写提示</view>
+          <view class="text">
+            <input placeholder="{{questionInfo.isRequired ? '必填': '选填'}}" bindinput="bindPlaceholder" />
+          </view>
         </view>
       </view>
       <view class="item" style="font-size: 15px;">
@@ -45,5 +60,53 @@
       <view class="btn">确认</view>
     </view>
   </view>
+
+  <view wx:if="{{editing}}" class="content" style="margin-top: {{statusBarHeight + navigatorH}}px">
+    <view class="list">
+      <view class="item">
+        <view style="font-size: 15px;"><text style="color: #f00">*</text> 标题</view>
+        <view class="text">
+          <textarea value="{{questionInfo.content}}" bindinput="bindChangeName"></textarea>
+        </view>
+      </view>
+      <view class="type">
+        <view style="display: flex;font-size: 30rpx;margin: 11px 0;wxcs_style_margin: 20rpx 0;align-items: center;">
+          <view>题目设为：</view>
+          <radio-group bindchange='radioChange'>
+            <radio value='true' checked="{{questionInfo.isRequired}}">必答</radio>
+            <radio value="false" checked="{{!questionInfo.isRequired}}" disabled="{{!isModifiable}}">非必答</radio>
+          </radio-group>
+        </view>
+        <view>
+          <view style="margin: 5px;">填写提示</view>
+          <view class="text">
+            <input value="{{questionInfo.placeholder}}" placeholder="{{questionInfo.isRequired ? '必填': '选填'}}" bindinput="bindChangePlaceholder" />
+          </view>
+        </view>
+      </view>
+
+      <view class="item" style="font-size: 15px;">
+        题目类型: {{questionInfo.type == 0 ? '选择题':'填空题'}}
+        <view wx:if="{{questionInfo.type == 0}}">
+          <view style="margin: 5px;">编辑选项</view>
+          <view class="options">
+            <block wx:for="{{questionInfo.options}}" wx:key="index">
+              <view class="option-item">
+                <view class="option-input">
+                  <input value="{{item}}" style="padding:3px 10px;" data-index="{{index}}" bindinput="bindOption"></input>
+                </view>
+                <view class="option-image" data-index="{{index}}" catchtap="deleteOption"><image style="width: 20px;height: 20px" src="{{images._delete}}"></image></view>
+              </view>
+            </block>
+          </view>
+          <view style="color: rgb(15, 177, 72);margin: 5px;" bindtap="addOption"> + 添加选项</view>
+        </view>
+      </view>
+    </view>
+    <view class='btn-view' bindtap="confirm">
+      <view class="btn">确认</view>
+    </view>
+  </view>
+  
   
 </view>

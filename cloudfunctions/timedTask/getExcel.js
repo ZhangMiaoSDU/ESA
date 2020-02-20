@@ -12,13 +12,16 @@ function getFTime() {
   return [new Date().getFullYear(), month, new Date().getDate()].join('/')
 }
 
-function formatData(questionsInfo, jqUser, jqInfo) {
+function formatData(questionsInfo, usersInfo, jqInfo) {
   let isoTime = getFTime();
   // console.log("isoTime: ", isoTime)
   let count = jqInfo.count;
   let questionDict = {};
   let header = [];
-  header.push('用户')
+  header.push('用户');
+  header.push('学号');
+  header.push('所在学院');
+  header.push('所在班级');
   questionsInfo.map(item => {
     questionDict[item._id] = { content: item.content, type: item.type, options: item.options ? item.options : [] };
     header.push(item.content)
@@ -26,27 +29,33 @@ function formatData(questionsInfo, jqUser, jqInfo) {
   // console.log("questionDict: ", questionDict);
   let allUsersSummary = []
   allUsersSummary.push(header)
-  jqUser.map(userId => {
-    let userAnswer = jqInfo[userId];
+  usersInfo.map(userInfo => {
+    // console.log("userInfo: ", userInfo)
+    let userId = userInfo._id;
+    let userAnswer = jqInfo[userId] || {};
     let _array = [];
     _array.push(userId);
+    _array.push(userInfo.stdID);
+    _array.push(userInfo.coll);
+    _array.push(userInfo._class);
     // console.log(userAnswer);
-    var leastAnswer = userAnswer[isoTime];
+    var leastAnswer = userAnswer[isoTime] || {};
     // console.log("leastAnswer: ", leastAnswer)
     for (let key in questionDict) {
       // 用户对于某一问题的答案 
-      if (leastAnswer[key]) {
+      if (leastAnswer[key] || leastAnswer[key] == 0) {
         if (questionDict[key].type == 1) {
           _array.push(leastAnswer[key])
         } else {
           var index = leastAnswer[key];
+          // console.log(questionDict[key], questionDict[key].options, index)
           _array.push(questionDict[key].options[index])
         }
       } else {
         _array.push("未填写")
       }
     }
-    // console.log(_array)
+    console.log(_array)
     allUsersSummary.push(_array);
   })
   console.log("allUsersSummary: ", allUsersSummary);
@@ -59,7 +68,15 @@ const getExcel = async id => {
   let jqRes = await db.collection(COLLECTIONNAME).doc(id).get();
   let jqInfo = jqRes.data;
   let jqUser = jqInfo.jqUser || [];
-  // console.log(jqInfo);
+  let tasksUser = [];
+  for (let i = 0; i < jqUser.length; i++) {
+    tasksUser.push(db.collection("user").doc(jqUser[i]).get())
+  }
+  let usersRes = await Promise.all(tasksUser);
+  console.log(usersRes)
+  let usersInfo = usersRes.map(item => { return item.data });
+  console.log("usersInfo: ", usersInfo);
+
   let jqQuestions = jqInfo.questions || [];
   let tasks = [];
   for (let i = 0; i < jqQuestions.length; i++) {
@@ -68,8 +85,9 @@ const getExcel = async id => {
   let questionsRes = await Promise.all(tasks);
   console.log(questionsRes)
   let questionsInfo = questionsRes.map(item => { return item.data });
-  // console.log(questionsInfo)
-  let allUsersSummary = formatData(questionsInfo, jqUser, jqInfo);
+  // console.log(questionsInfo);
+ 
+  let allUsersSummary = formatData(questionsInfo, usersInfo, jqInfo);
   try {
     //1,定义excel表格名
     let timestamp = new Date(getFTime()).getTime();

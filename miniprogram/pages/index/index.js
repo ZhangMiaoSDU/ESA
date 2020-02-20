@@ -87,9 +87,13 @@ Page({
 
   onLoad: function (options) {
     let _this = this;
+    wx.showLoading({
+      title: '加载中',
+    })
     this.initData();
     wxrequest.initCoreData().then(res => {
       // console.log(res);
+      wx.hideLoading();
       _this.setData({
         confirm: res[0].confirmedCount,
         curedCount: res[0].curedCount,

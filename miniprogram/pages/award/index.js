@@ -15,6 +15,8 @@ Page({
     univ: '',
     colls: ['手动输入'],
     coll: '',
+    _classes: ['手动输入'],
+    _class: '',
     images: images,
     baiduToken: null,
     sameLocation: true,
@@ -65,6 +67,10 @@ Page({
     univcollDB.doc('COLL').get().then(res => {
       console.log(res.data.name);
       _this.setData({ colls: res.data.name.concat('手动输入') })
+    })
+    univcollDB.doc('_CLASS').get().then(res => {
+      console.log(res.data.name);
+      _this.setData({ _classes: res.data.name.concat('手动输入') })
     })
   },
 
@@ -170,12 +176,12 @@ Page({
     })
   },
   bindName: function (e) {
-    console.log(e);
+    // console.log(e);
     let value = e.detail.value;
     this.setData({ name: value });
   },
   bindIdN: function(e) {
-    console.log(e);
+    // console.log(e);
     let value = e.detail.value;
     this.setData({ idNo: value });
   },
@@ -220,7 +226,7 @@ Page({
   },
 
   bindUnivChange(e) {
-    console.log(e);
+    // console.log(e);
     let index = e.detail.value;
     let univ = this.data.univs[index];
     if (univ == '手动输入') {
@@ -235,7 +241,7 @@ Page({
     this.setData({univ: e.detail.value})
   },
   bindCollChange(e) {
-    console.log(e);
+    // console.log(e);
     let index = e.detail.value;
     let coll = this.data.colls[index];
     if (coll == '手动输入') {
@@ -249,6 +255,23 @@ Page({
   bindColl(e) {
     this.setData({ coll: e.detail.value })
   },
+
+  bindClassChange(e) {
+    // console.log(e);
+    let index = e.detail.value;
+    let _class = this.data._classes[index];
+    if (_class == '手动输入') {
+      this.setData({
+        showClassInput: true
+      })
+    } else {
+      this.setData({ _class: _class, showClassInput: false })
+    }
+  },
+  bindClass(e) {
+    this.setData({ _class: e.detail.value })
+  },
+
   bindStdID(e) {
     this.setData({ stdID: e.detail.value})
   },
@@ -257,7 +280,7 @@ Page({
   },
 
   bindCourseChange(e) {
-    console.log(e);
+    // console.log(e);
     let checkedCourses = e.detail.value;
     if (checkedCourses.length == 0) {
       this.setData({ isCheckedCourse: false })
@@ -275,7 +298,7 @@ Page({
     }
   },
   bindCommitment(e) {
-    console.log(e);
+    // console.log(e);
     let checked = e.detail.value;
     if (checked.length == 2) {
       this.setData({ checkedCommitment: true })
@@ -286,7 +309,7 @@ Page({
   },
 
   bindNo(e) {
-    console.log(e)
+    // console.log(e)
     let value = e.detail.value;
     if (value[0] == '2') {
       this.setData({ checkdedNo: true})
@@ -312,23 +335,24 @@ Page({
           QQ: (this.data.QQ && this.data.QQ.trim()) || '',
           phone: (this.data.phone && this.data.phone.trim()) || '',
           idNo: (this.data.idNo && this.data.idNo.trim()) || '',
-          idcardLocation: (this.data.idcardLocation && this.data.idcardLocation.trim()) || '',
+          // idcardLocation: (this.data.idcardLocation && this.data.idcardLocation.trim()) || '',
           currentLocation: (this.data.currentLocation && this.data.currentLocation.trim()) || '',
           email: (this.data.email && this.data.email.trim()) || '',
           univ: (this.data.univ && this.data.univ.trim()) || '',
           coll: (this.data.coll && this.data.coll.trim()) || '',
           stdID: (this.data.stdID && this.data.stdID.trim()) || '',
+          _class: (this.data._class && this.data._class.trim()) || ''
         } 
-        // : {
-        //     name: (this.data.name && this.data.name.trim()) || '',
-        //     phone: (this.data.phone && this.data.phone.trim()) || '',
-        //   };
         console.log(info);
         let flag = true;
         if (isCheckedCourse) {
           Object.values(info).map(item => { if (item.trim() == '') { flag = false; } });
         } else {
-          let required = {name: info.name, phone: info.phone};
+          // 必须填写的信息：姓名、电话、大学、学院、学号
+          let required = { 
+            name: info.name, phone: info.phone, currentLocation: info.currentLocation,
+            coll: info.coll, univ: info.univ, stdID: info.stdID, _class: info._class
+          };
           Object.values(required).map(item => { if (item.trim() == '') { flag = false; } });
         }
         
@@ -347,14 +371,16 @@ Page({
         info['1ec2b976-f1fa-4689-afd8-f5a94e3a1934'] = info.QQ ? info.QQ : '';
         info['c8fd8c56-763b-415f-9bec-99d5f8909730'] = info.phone;
         info['cc6372c1-0bb6-4392-b951-534660622e7c'] = info.idNo ? info.idNo : '';
-        info['fb929da8-b0d2-45b1-9ff2-829eab9eada8'] = info.idcardLocation ? info.idcardLocation : '';
+        // info['fb929da8-b0d2-45b1-9ff2-829eab9eada8'] = info.idcardLocation ? info.idcardLocation : '';
         info['6d87ffa2-68b3-484e-944f-359d26866cb1'] = info.currentLocation ? info.currentLocation : '';
+        info['33c59194-fc0b-4415-b69b-5c132c49eda7'] = info.currentLocation ? info.currentLocation : '';
         info['6ae6348e-1285-4bd9-821a-36f8be522c23'] = info.coll ? info.coll : '';
         info['da755c4e-397b-4a8e-94c1-8167a63f976c'] = info.univ ? info.univ : '';
         info['6bfe20da-c970-433a-a23f-0305630c842f'] = info.email ? info.email : '';
-        info['3218ed04-9cf5-4ce3-8511-b16f8c608897'] = info.stdID ? info.stdID : '';
+        info['3218ed04-9cf5-4ce3-8511-b16f8c608897'] = info.stdID ? info.stdID : '';//3218ed04-9cf5-4ce3-8511-b16f8c608897
+        info['4ad9f710-59b2-4b78-ac1b-925082dbe06e'] = info._class ? info._class: ''
         info["checkedCourses"] = this.data.checkedCourses;//勾选的课程
-        info["isInterested"] = !this.data.checkdedNo;//是否感兴趣
+        info["isInterested"] = this.data.isCheckedCourse;//是否感兴趣，等价于是否选择了课程
         info["isFill"] = true
         // 将大学和学院名称保存至数据库
         this.saveUnivColl(info);
@@ -428,8 +454,9 @@ Page({
   saveUnivColl(info) {
     var univ = this.data.univ;
     var coll = this.data.coll;
+    var _class = this.data._class
     console.log(univ, coll);
-    if (univ.trim() == '' || coll.trim() == '') {
+    if (univ.trim() == '' || coll.trim() == '' || _class.trim() == '') {
       // wx.showToast({
       //   title: '大学信息和学院信息无效',
       //   icon: 'none'
@@ -451,6 +478,13 @@ Page({
           coll: coll
         }
       }));
+      tasks.push(wx.cloud.callFunction({
+        name: 'updateDoc',
+        data: {
+          addClass: true,
+          _class: _class
+        }
+      }))
 
       return new Promise((resolve, reject) => {
         Promise.all(tasks).then(res => {
@@ -487,7 +521,7 @@ Page({
   chooseLocation(e) {
     let _this = this
     console.log("chooseLocation", e);
-    let index = e.currentTarget.dataset.index
+    
     wx.getSetting({
       success: res => {
         if (!res.authSetting['scope.userLocation']) {
@@ -499,6 +533,7 @@ Page({
             fail: res => { console.log(res) }
           })
         } else {
+          let index = e.currentTarget.dataset.index
           wx.chooseLocation({
             success: function (res) {
               console.log(res);
@@ -516,4 +551,15 @@ Page({
       }
     })
   },
+
+  viewProfile() {
+    wx.navigateTo({
+      url: '../profile/index',
+    })
+  },
+  goback() {
+    wx.switchTab({
+      url: '../home/index',
+    })
+  }
 })

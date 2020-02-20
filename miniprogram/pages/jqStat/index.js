@@ -73,11 +73,13 @@ Page({
         })
       }
       _this.setData({ dateList: dateList})
-      console.log(start, end, '\n', dateList)
-      _this.formatSummary(jqInfo).then(res => {
-        console.log(res);
-        _this.setData({ summary: res });
-      });
+      console.log(start, end, '\n', dateList);
+      let allAnswer = _this.formatSummary(jqInfo)
+      // .then(res => {
+      //   console.log(res);
+        
+      // });
+      _this.setData({ summary: allAnswer });
     })
   },
 
@@ -95,10 +97,10 @@ Page({
       index: Index,
       selectShow: !this.data.selectShow
     });
-    this.formatSummary(this.data.jqInfo).then(res => {
-      console.log(res);
-      _this.setData({ summary: res });
-    });
+    let allAnswer = _this.formatSummary(this.data.jqInfo)
+
+    _this.setData({ summary: allAnswer });
+
   },
 
   cancelMask() {
@@ -111,17 +113,74 @@ Page({
   }, 
 
   formatSummary(jqInfo) {
-    let jqUser = jqInfo.jqUser || [];
-    let sendEmailTime = jqInfo.remodeDetail;
-    let questions = jqInfo.questions || [];
-    console.log(questions);
-    let tasks = this.loadQuestions(questions);
     let questionDict = {};
     let allAnswer = [];
+    
+    let _this = this;
+
+    let jqUser = jqInfo.jqUser || [];
+    let sendEmailTime = jqInfo.remodeDetail;
+    let jqQuestions = jqInfo.questions || [];//该问卷的所有id
+    let jqQuestionsName = jqInfo.questionsName || []; //该问卷的所有问题的信息
+    console.log(jqQuestionsName);
+    _this.setData({ jqQuestionsName: jqQuestionsName })
+    // 根据id，查询
+    let questionsInfo = jqQuestionsName.filter(item => {
+      let _qid = Object.keys(item)[0];//问题的id
+      if (jqQuestions.indexOf(_qid) != -1) {
+        console.log("downloadData =======>  问卷中有该问题");
+        return item;
+      }
+    }).map(item => {
+      let _qid = Object.keys(item)[0];//问题的id
+      return item[_qid]
+    })
+    console.log("downloadData =======>  questionsInfo: ", questionsInfo);
+    questionsInfo.map(item => {
+      questionDict[item._id] = { content: item.content, type: item.type, options: item.options ? item.options : [], answers: [] }
+    });
     let selectTime = this.data.dateList[this.data.index].split('-') + ' ' + sendEmailTime[0] + ':' + sendEmailTime[1];
     let selectTimeISO = new Date(selectTime).toISOString().split('T')[0].split('-').join('/'); //格式："2020/02/16"
     console.log("selectTime: ", selectTime, "selectTimeISO: ", selectTimeISO)
-    let _this = this;
+    jqUser.map(userId => {
+      let userAnswer = jqInfo[userId][selectTimeISO];
+      console.log("user: ", userAnswer)
+      if (userAnswer) {
+        userAnswer['id'] = userId;
+        userAnswer['time'] = utils.formatDate(userAnswer.submitTime);
+        userAnswer['qa'] = [];
+        let count = 0;
+        for (let key in questionDict) {
+          if (userAnswer[key] != undefined) {
+            // console.log(questionDict[key])
+            questionDict[key].answers.push(userAnswer[key]);
+            let qc = questionDict[key].content;
+            if (questionDict[key].type == 1) {
+              userAnswer['qa'].push({ question: qc, answer: userAnswer[key] })
+            } else {
+              questionDict[key].index = count;
+              count += 1
+              var index = userAnswer[key];
+              userAnswer['qa'].push({ question: qc, answer: questionDict[key].options[index] })
+            }
+          } else {
+            userAnswer['qa'].push({ question: questionDict[key].content, answer: '(空)' });
+            // console.log("KEY:", key, questionDict[key])
+          }
+        }
+        // console.log("userAnswer: ", userAnswer)
+        allAnswer.push(userAnswer)//当有答案时添加
+      }
+
+    })
+
+    console.log("questionDict: ", questionDict)
+    _this.setData({ questionDict: questionDict });
+    allAnswer.sort((a, b) => b.submitTime - a.submitTime)
+    return allAnswer;
+    /*console.log(questions);
+    let tasks = this.loadQuestions(questions);
+    
     return new Promise((resolve, reject) => {
       Promise.all(tasks).then(res => {
         let questionsInfo = res.map(item => { return item.data })
@@ -156,8 +215,9 @@ Page({
               }
             }
             // console.log("userAnswer: ", userAnswer)
-          }
-          allAnswer.push(userAnswer)
+            allAnswer.push(userAnswer)//当有答案时添加
+          } 
+          
         })
         console.log("questionDict: ", questionDict)
         _this.setData({ questionDict: questionDict});
@@ -165,7 +225,7 @@ Page({
         resolve(allAnswer);
       })
       .catch(res => reject(res))
-    }) 
+    })*/ 
   },
   viewChart(e) {
     let questionDict = this.data.questionDict;
@@ -178,7 +238,7 @@ Page({
     let length = label.length;
     var counted = data.reduce(function (alldata, data) {
       if (data in alldata) {
-        allNames[data]++;
+        alldata[data]++;
       }
       else {
         alldata[data] = 1;

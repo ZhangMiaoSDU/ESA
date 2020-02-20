@@ -8,7 +8,7 @@
   <view class="search-box" style="margin-top:{{statusBarHeight + navigatorH}}px">
     <view class="input-box">
       <image src="{{images.search}}"></image>
-      <input bindinput="bindQ" style="flex: 1;padding: 10rpx;" placeholder="输入问卷编号"></input>
+      <input bindinput="bindQ" style="flex: 1;padding: 10rpx;" placeholder="输入问卷编号" value="{{queryid}}"></input>
       <view class="search" catchtap="search">搜索</view>
     </view>
   </view>
@@ -32,7 +32,7 @@
     </view>
   </view>
 
-  <view class="list" wx:else>
+  <scroll-view class="list" scroll-y style="height:{{windowHeight-30}}px" wx:else>
     <block wx:for="{{jqsInfo}}" wx:key="index">
       <view class="item">
         <view style="display: flex; align-items:center">
@@ -47,6 +47,6 @@
         <view catchtap="fillJQ" data-id="{{item._id}}" data-name="{{item.name}}" style="color: #0FB148">进入填写</view>
       </view>
     </block>
-  </view>
+  </scroll-view>
 </view>
 

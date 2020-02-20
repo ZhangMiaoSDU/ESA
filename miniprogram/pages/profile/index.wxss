@@ -1,0 +1,47 @@
+/* pages/profile/index.wxss */
+.item {
+  display: flex;
+  justify-content: space-between;
+  margin: 20rpx;
+  border-bottom: 1rpx solid #f1f1f1;
+  padding: 20rpx 0;
+  color: #3c3c3c;
+}
+
+.picker-view, .right {
+  display: flex;
+  align-items: center
+}
+
+.right image, .picker-view image {
+  width: 30rpx;
+  height: 30rpx;
+  margin: 0 10rpx;
+}
+
+.mask-content {
+  background: #fff;
+  width: 80%;
+  padding: 10rpx 30rpx;
+  border-radius: 30rpx;
+}
+
+.mask .mask-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20rpx 0
+}
+
+.mask .input {
+  height: 80rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid #f1f1f1;
+  margin: 30rpx 0;
+}
+
+.input input {
+  padding: 0 20rpx;
+  height: 100%;
+  line-height: 80rpx;
+}
