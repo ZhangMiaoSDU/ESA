@@ -87,27 +87,41 @@ Page({
 
   onLoad: function (options) {
     let _this = this;
+    wx.hideHomeButton();
     wx.showLoading({
       title: '加载中',
     })
+   
     this.initData();
-    wxrequest.initCoreData().then(res => {
-      // console.log(res);
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initCoreData: true }
+    })
+    // wxrequest.initCoreData()
+    .then(res => {
+      res = res.result;
+      console.log(res);
       wx.hideLoading();
       _this.setData({
         confirm: res[0].confirmedCount,
         curedCount: res[0].curedCount,
         deadCount: res[0].deadCount
       })
-    })
+    }) 
     
   },
-
+ 
   initData() {
     let _this = this;
-    wxrequest.initData().then(res => {
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initData: true }
+    }).then(res => { 
+      // console.log(res)
+    // })
+    // wxrequest.initData().then(res => {
       // console.log(res);
-      let areaData = res;
+      let areaData = res.result;
       let confirmedN = [];
       let max = 0;
       console.log(areaData[0].updateTime)

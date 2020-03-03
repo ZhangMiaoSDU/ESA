@@ -4,33 +4,138 @@ const db = wx.cloud.database();
 const userDB = db.collection('user');
 const images = require('../../utils/images.js');
 const univcollDB = db.collection('univ-coll');
+const groupDB = db.collection('group');
 Page({
 
   data: {
     statusBarHeight: app.globalData.statusBarHeight,
     navigatorH: app.globalData.navigatorH,
     screenWidth: app.globalData.screenWidth,
-    images: images
+    images: images,
+    identities: ['普通成员', '管理员'],
+  },
+ 
+  onLoad: function (options) {
+    console.log("profile ========> options: ", options)
+    let _this = this;
+    var openid = app.globalData.openid;//当前在线操作的用户
+    if (options.gid) {
+      this.setData({view: true})
+      var info = JSON.parse(options.uinfo);
+      var gid = options.gid;
+      groupDB.where({id: gid}).get().then(res => {
+        var gAdmin = res.data[0].administrator || [];//管理员列表；
+        var gCreator = res.data[0].creator;
+        // 如果当前用户是该组的创建者或者是管理员，则可以修改他人的身份
+        if (gCreator == openid || gAdmin.indexOf(openid) != -1) {
+          _this.setData({ hasPermission: true, gCreator: gCreator})
+        }
+        if (gAdmin.indexOf(info._id) == -1 && info._id != gCreator) { 
+          info.isAdmin = false;
+          info.identity = '普通成员'
+        } else { 
+          info.isAdmin = true;
+          info.identity = '管理员'
+        }
+        this.setData({ userInfo: info, gid: options.gid, gAdmin: gAdmin })
+      })
+    } else {
+      userDB.doc(app.globalData.openid).get().then(res => {
+        console.log(res.data);
+        this.setData({ userInfo: res.data })
+      });
+      univcollDB.doc('UNIV').get().then(res => {
+        console.log(res.data.name);
+        _this.setData({ univs: res.data.name.concat('手动输入') })
+      })
+      univcollDB.doc('COLL').get().then(res => {
+        console.log(res.data.name);
+        _this.setData({ colls: res.data.name.concat('手动输入') })
+      })
+      univcollDB.doc('_CLASS').get().then(res => {
+        console.log(res.data.name);
+        _this.setData({ _classes: res.data.name.concat('手动输入') })
+      })
+    }
   },
 
-  onLoad: function (options) {
-    let _this = this
-    userDB.doc(app.globalData.openid).get().then(res => {
-      console.log(res.data);
-      this.setData({userInfo: res.data})  
-    });
-    univcollDB.doc('UNIV').get().then(res => {
-      console.log(res.data.name);
-      _this.setData({ univs: res.data.name.concat('手动输入') })
-    })
-    univcollDB.doc('COLL').get().then(res => {
-      console.log(res.data.name);
-      _this.setData({ colls: res.data.name.concat('手动输入') })
-    })
-    univcollDB.doc('_CLASS').get().then(res => {
-      console.log(res.data.name);
-      _this.setData({ _classes: res.data.name.concat('手动输入') })
-    })
+  bindIdentityChange(e) {
+    var _this = this;
+    var gCreator = this.data.gCreator;
+    var userInfo = this.data.userInfo;//当前查看的用户
+    var openid = app.globalData.openid;//当前在线操作的用户
+    //当前操作用户（不是该组的创建者）是管理员不能修改该组创建者的身份信息
+    if (openid != gCreator && userInfo._id == gCreator) {
+      wx.showToast({
+        title: '不能修改创建者的身份！',
+        icon: 'none'
+      })
+      return;
+    }
+    var gid = this.data.gid;
+    var originIdentity = userInfo.identity;
+    var index = e.detail.value;
+    var identity = this.data.identities[index];
+    if (identity != originIdentity) {
+      // 由普通成员到管理员
+      if (identity == '管理员') {
+        wx.cloud.callFunction({
+          name: 'updateDoc',
+          data: {
+            addGroupAdmin: true,
+            uid: userInfo._id,
+            gid: gid
+          }
+        }).then(res => {
+          console.log(res); 
+          userInfo.identity = identity;
+          _this.setData({ userInfo: userInfo })
+        })
+        .catch(res => {console.log(res)})
+      } else if (identity == '普通成员'){
+        wx.cloud.callFunction({
+          name: 'updateDoc',
+          data: {
+            removeGroupAdmin: true,
+            uid: userInfo._id,
+            gid: gid
+          }
+        }).then(res => { 
+          console.log(res);
+          userInfo.identity = identity;
+          _this.setData({ userInfo: userInfo })
+        })
+          .catch(res => { console.log(res) })
+      }
+    }
+  },
+  deleteMember() {
+    var uid = this.data.userInfo._id;
+    var userInfo = this.data.userInfo;//当前查看的用户
+    var gCreator = this.data.gCreator;
+    var gid = this.data.gid;
+    var openid = app.globalData.openid;//当前在线操作的用户
+    //当前操作用户（不是该组的创建者）是管理员不能修改该组创建者的身份信息
+    if (openid != gCreator && userInfo._id == gCreator) {
+      wx.showToast({
+        title: '不能修改创建者的身份！',
+        icon: 'none'
+      })
+      return;
+    }
+    var _this = this;
+    console.log("deleteMember ======> ", uid, gid)
+    wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        removeGroupM: true,
+        gid: gid,
+        uid: uid
+      }
+    }).then(res => {
+      console.log(res);
+      _this.goBack()
+    }).catch(res => {console.log(res)})
   },
   
   bindCollChange(e) {
@@ -388,6 +493,10 @@ Page({
     }
   },
   goBack() {
+    if (this.data.view) {
+      wx.navigateBack({delta: 1})
+      return;
+    }
     wx.switchTab({
       url: '../home/index',
     })

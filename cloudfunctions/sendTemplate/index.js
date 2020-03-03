@@ -13,16 +13,24 @@ exports.main = async (event, context) => {
   // 从数据库中获取AccessToken
   let tokenRes = await db.collection(COLL_FIELD_NAME).doc(FIELD_NAME).get();
   let token = tokenRes.data.token; // access_token
-  let openids = event.openids;//需要发送消息的用户
+  let openids = 
+  // event.openids;//需要发送消息的用户
+  [
+    'ogesF5mRbSjxEe4DHne_eVihy8WE', 'ogesF5jTHX3DbkkFU1JeD7Tc5HcY', 'ogesF5sRy3mAxrLAVJ1fqe8yuseU', 'ogesF5uarb9v3dKX7Lx8Kc1VNla4', 'ogesF5gcUaPfyjWQGUsqK7G_pe9A', 'ogesF5kNxsOEuBPzBCBF8pnPUCGQ',
+    'ogesF5nUFrglfmJWqkcr3GaCYlzw', 'ogesF5iNs-DvtuNeFJg-OQoyBby8'
+    ]
+  
 
   let msgData = {
     "thing3": { "value": "请填写今天问卷: " + event.jqName},
+    // "thing3": { "value": "测试，请忽略" },
     "date2": { "value": event.time },
   };
   let page = 'pages/createJQ/index?jq=' + event.jqName + '&id=' + event.jqid;
 
   for (let i = 0;i < openids.length; i++) {
-    let openid = openids[i].id;
+    // let openid = openids[i].id;//需要改
+    let openid = openids[i]
     let sendRes = await rp({
       json: true,
       method: 'POST',
@@ -34,7 +42,7 @@ exports.main = async (event, context) => {
         data: msgData
       }
     }).then(res => {
-      console.log(res);
+      console.log(openid, res);9
       if (res.errcode == 43101) {
         openids[i].accept = false
       } else {

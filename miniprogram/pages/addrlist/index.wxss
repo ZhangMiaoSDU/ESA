@@ -1,0 +1,46 @@
+/* pages/addrlist/index.wxss */
+
+.item {
+  display: flex;
+  height: 100rpx;
+  padding: 10rpx 20rpx;
+  align-items: center;
+}
+
+.header .image {
+  background: rgba(47, 127, 240, .1);
+}
+
+.header .text.create {
+  color: rgba(47, 127, 240, .8)
+}
+
+.item .image {
+  display: flex;
+  align-items: center;
+  height: 60rpx;
+  width: 60rpx;
+  padding: 10rpx;
+  justify-content: center;
+  border-radius: 10rpx;
+  margin-right: 30rpx;
+}
+
+.image image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%
+}
+
+.create.text {
+  /* color: rgba(47, 127, 240, .8); */
+  flex: 1;
+  height: 100rpx;
+  line-height: 100rpx;
+  border-bottom: 1rpx solid #f1f1f1;
+}
+
+.item-label {
+  float: right;
+  color: #898989
+}

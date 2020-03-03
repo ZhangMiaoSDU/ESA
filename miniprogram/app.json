@@ -2,6 +2,12 @@
   "pages": [
     
     "pages/index/index",
+    "pages/invite/index",
+    "pages/gList/index",
+    "pages/addMem/index",
+    "pages/mem/index",
+    "pages/RCompany/index",
+    "pages/addrlist/index",
     "pages/fillJQ/index",
     "pages/temp/index",
     "pages/ques/index",
@@ -20,6 +26,7 @@
     "pages/createJQ/index",
     "pages/province/index",
     "pages/config/index",
+    
     "pages/fillBlank/index"
   ],
   "permission": {
@@ -48,7 +55,7 @@
       },
       {
         "pagePath": "pages/award/index",
-        "text": "注册领奖学金",
+        "text": "注册",
         "iconPath": "./images/award.png",
         "selectedIconPath": "./images/award-active.png"
       },
@@ -63,6 +70,12 @@
         "text": "快速联系",
         "iconPath": "./images/contact.png",
         "selectedIconPath": "./images/contact-active.png"
+      },
+      {
+        "pagePath": "pages/mem/index",
+        "text": "用户管理",
+        "iconPath": "./images/member.png",
+        "selectedIconPath": "./images/member-active.png"
       }
     ]
   },

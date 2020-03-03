@@ -1,0 +1,71 @@
+<!--pages/addMem/index.wxml-->
+<view>
+  <view class="search-box" wx:if="{{!showSearch}}">
+    <view class="input-box" bindtap="showSearch">
+      <image src="{{images.search}}"></image>
+      <text>搜索</text>
+    </view> 
+  </view>
+  <view class="search-box searching" wx:if="{{showSearch}}">
+    <view class="input-box">
+      <image src="{{images.search}}"></image>
+      <input bindinput="bindQ" style="flex: 1;padding: 10rpx; " placeholder="搜索"></input>
+    </view>
+    <text class="cancelSearch" catchtap="cancelSearch">取消</text>
+  </view>
+  <!-- 搜索结果 -->
+  <scroll-view scroll-y="true" style="height:{{windowHeight - 90}}px; margin:10rpx auto" class="search-res" wx:if="{{showSearch && searchUs && searchUs.length > 0}}">
+    <block wx:for="{{searchUs}}" wx:key="index">
+      <view class="item">
+        <view class="image">
+          <image src="{{item.userHeader}}"></image>
+        </view>
+        <view class="text create">
+          <text>{{item.name}}</text>
+          <text style="color: #333;font-size: 26rpx;margin: 10rpx;">{{item.tag}}</text>
+          <text wx:if="{{item.isJoined}}" class="item-label">已加入</text>
+          <text wx:else class="item-label item-joined" bindtap="addThisUser" data-uid="{{item._id}}">添加</text>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+  <view class="confirmbtn" wx:if="{{showSearch && searchUs && searchUs.length > 0}}" bindtap="confirm">
+    添加全部({{searchUs.length}})
+  </view>
+  <!-- <view class="list" wx:if="{{!showSearch}}">
+    <block wx:for="{{allUser}}" wx:key="index">
+      <view class="item">
+        <view class="image">
+          <image src="{{item.userHeader}}"></image>
+        </view>
+        <view class="text create">
+          <text>{{item.name}}</text>
+          <text wx:if="{{item.isJoined}}" class="item-label">已加入</text>
+          <text wx:else class="item-label item-joined" bindtap="addThisUser" data-uid="{{item._id}}">添加</text>
+        </view>
+      </view>
+    </block>
+  </view> -->
+</view>
+
+
+<!-- <view class="mask" wx:if="{{showSearch}}" bindtap="cancelAddFromDB" style="background: rgba(0,0,0,.3);">
+  <view class="content" catchtap="s">
+    <view class="search-box">
+      <view class="input-box">
+        <image src="{{images.search}}"></image>
+        <input bindinput="bindQ" style="flex: 1;padding: 10rpx; " placeholder="搜索"></input>
+        <text class="cancelSearch" catchtap="cancelSearch">取消</text>
+      </view>
+    </view>
+    <view class="search-res">
+      <block wx:for="{{searchQs}}" wx:key="index">
+        <view class='search-item' catchtap="addtheQuestion" data-id="{{item._id}}" data-name="{{item.content}}" data-item="{{item}}">
+          <view style="color: #3c3c3c;">{{item.content}}</view>
+          <view style="color: #3c3c3c;">{{item.type==1 ? "填空题": "选择题"}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view> -->
+

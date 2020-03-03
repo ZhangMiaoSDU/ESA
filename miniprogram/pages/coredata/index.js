@@ -1,41 +1,18 @@
 // pages/coredata/index.js
 const app = getApp();
-const images = require('../../utils/images.js')
+const images = require('../../utils/images.js');
+const utils = require('../../utils/utils.js');
 const db = wx.cloud.database();
 const jqDB = db.collection('jq');
 const questionDB = db.collection('question');
 const userDB = db.collection('user');
 const FileSystemManager = wx.getFileSystemManager();
 
-function getDate(datestr) {
-  var temp = datestr.split("-");
-  var date = new Date(temp[0], temp[1] - 1, temp[2]);
-  return date;
-}
- 
-function formatEveryDay(start, end) {
-  let dateList = [];
-  var startTime = getDate(start);
-  var endTime = getDate(end);
-
-  while ((endTime.getTime() - startTime.getTime()) >= 0) {
-    var year = startTime.getFullYear();
-    var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
-    var day = startTime.getDate().toString().length == 1 ? "0" + startTime.getDate() : startTime.getDate();
-    dateList.push(year + "/" + month + "/" + day);
-    startTime.setDate(startTime.getDate() + 1);
-  }
-  return dateList;
-}
-
 function timestampToTime(timestamp) {
   const date = new Date(timestamp)
-  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate()}`
+  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate() }`
 }
 
-function timeToISOTiem(cstime) {
-  return new Date(cstime).toISOString().split('T')[0];
-}
 Page({
   data: {
     images: images,
@@ -51,12 +28,102 @@ Page({
     let _this = this
     this.loadJQ(app.globalData.openid).then(res => {
       let jqs = res.result ? res.result.data : [];
-      jqs.map(item => { return item.filled = item[_this.data.currentDay] ? item[_this.data.currentDay].length : 0, item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0 })
+      jqs.map(item => { 
+        if (item.type == 0) {
+          console.log("一次性问卷 所有提交的人个数");
+          item.filled = item.jqUser ? item.jqUser.length : 0;
+          item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
+          var startTime = timestampToTime(item.creationTime);//开始时间，gmt
+          console.log("startTime: ", startTime);
+          let deadline = item.deadline.split('-').join('/');//截止日期
+          item.period = [startTime.split('-').join('/'), deadline];
+        }
+        if (item.type == 1) {
+          console.log("按月 填写人数 = 记录当前时间段提交的人数");
+          var resMonth = this.fillByMonth(item);
+          console.log("remonth: ", resMonth)
+          var currentDay = resMonth[0], period = resMonth[1];
+          item.filled = item[currentDay] ? item[currentDay].length : 0;
+          item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
+          item.period = period;
+        }
+        if (item.type == 2) {
+          console.log("按日 填写人数为记录每天的人数 应填人数为名单人员或之前提交问卷的人数");
+          var currentDay = _this.data.currentDay
+          console.log("currentDay: ", currentDay)
+          item.filled = item[currentDay] ? item[currentDay].length : 0;
+          item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
+          item.period = [currentDay];
+        }
+        if (item.type == 3) {
+          console.log("按周 填写人数 = 记录当前时间段提交的人数 应填人数 = 名单人员或之前提交问卷的人数");
+          var resWeek = this.fillByWeek(item);
+          console.log("resWeek: ", resWeek)
+          var currentDay = resWeek[0], period = resWeek[1];
+          item.filled = item[currentDay] ? item[currentDay].length : 0;
+          item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
+          item.period = period;
+        }
+      })
       _this.setData({ jqs: jqs });
       console.log(this.data.jqs)
     })
 
-    // 查看
+  },
+  fillByMonth(jqInfo) {
+    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
+    console.log("startTime: ", startTime);
+    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
+    let endTime;
+    var deadlineTime = timestampToTime(deadline)
+    endTime = deadlineTime;
+    console.log("endTime: ", endTime)
+    var day = jqInfo.date;
+    var dateList = utils.formatEveryMonthDay(startTime, endTime, day);
+    console.log(dateList, startTime, endTime, day)
+    let currentDay, period;
+    var now = new Date().getTime();//当前时间戳
+    for (let i = 0; i < dateList.length - 1; i++) {
+      var dateTimestamp = new Date(dateList[i]).getTime();
+      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
+      if (now >= dateTimestamp && now < nextdateTimestamp) {
+        currentDay = dateList[i];
+        period = [dateList[i], dateList[i + 1]];
+      }
+      if (now >= dateTimestamp && !nextdateTimestamp) {
+        currentDay = dateList[i];
+        period = [dateList[i], endTime.split('-').join('/')];
+      }
+    }
+    return [currentDay, period];
+  },
+
+  fillByWeek(jqInfo) {
+    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
+    console.log("startTime: ", startTime);
+    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
+    let endTime;
+    var deadlineTime = timestampToTime(deadline)
+    endTime = deadlineTime;
+    console.log("endTime: ", endTime)
+    var selectedDay = jqInfo.selectedDay;
+    var dateList = utils.formatEveryWeekDay(startTime, endTime, selectedDay);
+    console.log("fillByWeek ========> dateList: ", dateList)
+    var currentDay, period;
+    var now = new Date().getTime();//当前时间戳
+    for (let i = 0; i < dateList.length; i++) {
+      var dateTimestamp = new Date(dateList[i]).getTime();
+      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
+      if (now >= dateTimestamp && now < nextdateTimestamp) {
+        currentDay = dateList[i];
+        period = [dateList[i], dateList[i + 1]];
+      }
+      if (now >= dateTimestamp && !nextdateTimestamp) {
+        currentDay = dateList[i];
+        period = [dateList[i], endTime.split('-').join('/')];
+      }
+    }
+    return [currentDay, period];
   },
 
   loadJQ(userId) {
@@ -83,137 +150,34 @@ Page({
     wx.showLoading({
       title: '正在生成数据',
     })
+    var _this = this;
     console.log("downloadData: ", e)
     let jqid = e.currentTarget.dataset.id;
-    // let jqid = '8d65afde5e4ba1d90064636c007454a2';
-    let _this = this;
     var jqsInfo = this.data.jqs;
-    var currentjqInfo = jqsInfo.filter(item => {return item._id == jqid})[0];
-    console.log("currentjqInfo: ", currentjqInfo);
-    var sendEmailHour = currentjqInfo.remodeDetail[0], sendEmailMinute = currentjqInfo.remodeDetail[1];
-    var csTime = timestampToTime(currentjqInfo.creationTime) + ' ' + sendEmailHour + ':' + sendEmailMinute;
-    let startiso = timeToISOTiem(csTime);
-    console.log("csTime: ", csTime, "startiso: ", startiso);
-    let nowiso = timeToISOTiem(new Date().getTime());//当前时间
-    console.log("nowiso: ", nowiso)
-    let deadline = currentjqInfo.deadline.split('-').join('/');//截止日期
-    let endiso;
-    if (new Date().getTime() < new Date(deadline).getTime()) {
-      console.log('还未到截止日期');
-      endiso = nowiso;
-    } else {
-      var deadlineiso = timeToISOTiem(deadline + ' ' + sendEmailHour + ':' + sendEmailMinute)
-      endiso = deadlineiso
-    }
-    console.log("endiso: ", endiso)
-    // end = currentjqInfo.deadline
-    let dateList = formatEveryDay(startiso, endiso);
-    if (currentjqInfo.type == 1) {
-      console.log("按月");
-      var alertDate = currentjqInfo.modeDetail[0];
-      dateList = dateList.filter(item => {
-        return item.split('/')[2] == alertDate;
-      })
-    }
-    _this.setData({ dateList: dateList });
-    console.log(startiso, endiso, '\n', dateList)
-    let jqUser = currentjqInfo.jqUser || [];
-    let jqQuestions = currentjqInfo.questions || [];//该问卷的所有id
-    let jqQuestionsName = currentjqInfo.questionsName || []; //该问卷的所有问题的信息
-    console.log(jqQuestionsName);
-    _this.setData({ jqQuestionsName: jqQuestionsName })
-    // 根据id，查询
-    let questionsInfo = jqQuestionsName.filter(item => {
-      let _qid = Object.keys(item)[0];//问题的id
-      if (jqQuestions.indexOf(_qid) != -1) {
-        console.log("downloadData =======>  问卷中有该问题");
-        return item;
+    var currentjqInfo = jqsInfo.filter(item => { return item._id == jqid })[0];
+    wx.cloud.callFunction({
+      name: 'excel',
+      data: {
+        name: `${jqid}/${currentjqInfo.name}`,
+        jqid: jqid,
       }
-    }).map(item => {
-      let _qid = Object.keys(item)[0];//问题的id
-      return item[_qid]
-    })
-    console.log("downloadData =======>  questionsInfo: ", questionsInfo);
-    let tasksUser = [];
-    for (let i = 0; i < jqUser.length; i++) {
-      tasksUser.push(userDB.doc(jqUser[i]).get())
-    }
-    Promise.all(tasksUser).then(usersRes => {
-      console.log(usersRes)
-      let usersInfo = usersRes.map(item => { return item.data });
-      console.log("usersInfo: ", usersInfo);
-      let summaryDict = _this.formatData(questionsInfo, usersInfo, currentjqInfo, dateList);
-      console.log("downloadData =======>  summaryDict: ", JSON.stringify(summaryDict));
-      wx.cloud.callFunction({
-        name: 'excel',
-        data: {
-          name: `${jqid}/${currentjqInfo.name}`,
-          summaryDict: summaryDict
-        }
-      }).then(res => {
-        console.log(res);
-        wx.showLoading({
-          title: '获取下载链接',
-        })
-        _this.getFileUrl(res.result.fileID)
-      }).catch(res => {
-        console.log(res)
+    }).then(res => {
+      console.log(res);
+      if (res.result == 0) {
+        wx.showToast({
+          title: '当前问卷中没有问题',
+          icon: 'none'
+        });
+        return;
+      }
+      wx.showLoading({
+        title: '获取下载链接',
       })
+      _this.getFileUrl(res.result.fileID)
+    }).catch(res => {
+      console.log(res)
     })
   }, 
-
-  formatData(questionsInfo, usersInfo, currentjqInfo, dateList) {
-    let questionDict = {};
-    let header = [];
-    header.push('用户');
-    header.push('学号');
-    header.push('所在学院');
-    header.push('所在班级');
-    console.log("questionsInfo: ", questionsInfo);
-    questionsInfo.map(item => {
-      questionDict[item._id] = {content:item.content, type:item.type, options:item.options ? item.options:[]};
-      header.push(item.content)
-    });
-    console.log("questionDict: ", questionDict);
-    let summaryDict = [];
-    for (let i = 0; i < dateList.length; i++) {
-      let date = dateList[i];
-      let allUsersSummary = []
-      allUsersSummary.push(header);
-      usersInfo.map(userInfo => {
-        let userId = userInfo._id;
-        let userAnswer = currentjqInfo[userId][date];
-        let _array = [];
-        if (userAnswer) {
-          _array.push(userId);
-          _array.push(userInfo.stdID);
-          _array.push(userInfo.coll);
-          _array.push(userInfo._class);
-          for (let key in questionDict) {
-            if (userAnswer[key]) {
-              if (questionDict[key].type == 1) {
-                _array.push(userAnswer[key])
-              } else {
-                var index = userAnswer[key];
-                _array.push(questionDict[key].options[index])
-              }
-            } else {
-              _array.push("未填写")
-            }
-          }
-          // console.log(_array)
-          allUsersSummary.push(_array);
-        }
-      })
-      // console.log("allUsersSummary: ", allUsersSummary);
-      summaryDict.push({
-        name: date.split('/').join('-'),
-        data: allUsersSummary
-      })
-    }
-    return summaryDict;
-  },
-
   //获取云存储文件下载地址，这个地址有效期一天
   getFileUrl(fileID) {
     let that = this;
@@ -280,7 +244,25 @@ Page({
     var jqsInfo = this.data.jqs;
     var currentjqInfo = jqsInfo.filter(item => { return item._id == jqid })[0];
     var currentDay = this.data.currentDay;
-    console.log(currentDay, currentjqInfo)
+    if (currentjqInfo.type == 0) {
+      console.log("一次性问卷 查看未填写人员");
+      var deadline = currentjqInfo.deadline;//一次性文问卷截止日期
+      currentDay = deadline.split('-').join("/");
+    }
+    if (currentjqInfo.type == 1) {
+      console.log("按月 未填写人 = 记录当前时间段未提交的人数");
+      var resMonth = this.fillByMonth(currentjqInfo);
+      console.log("remonth: ", resMonth)
+      currentDay = resMonth[0];
+    }
+
+    if (currentjqInfo.type == 3) {
+      console.log("按月 未填写人 = 记录当前时间段未提交的人数");
+      var resWeek = this.fillByWeek(currentjqInfo);
+      console.log("resWeek: ", resWeek)
+      currentDay = resWeek[0];
+    }
+    // console.log(currentDay, currentjqInfo)
     var filledUserId = currentjqInfo[currentDay] || [];
     // 应填名单
     var list = currentjqInfo.list;
@@ -313,6 +295,24 @@ Page({
     var jqsInfo = this.data.jqs;
     var currentjqInfo = jqsInfo.filter(item => { return item._id == jqid })[0];
     var currentDay = this.data.currentDay;
+    if (currentjqInfo.type == 0) {
+      console.log("一次性问卷 查看填写人员");
+      var deadline = currentjqInfo.deadline;//一次性文问卷截止日期
+      currentDay = deadline.split('-').join("/");
+    }
+    if (currentjqInfo.type == 1) {
+      console.log("按月 填写人 = 记录当前时间段未提交的人数");
+      var resMonth = this.fillByMonth(currentjqInfo);
+      console.log("remonth: ", resMonth)
+      currentDay = resMonth[0];
+    }
+
+    if (currentjqInfo.type == 3) {
+      console.log("按月 填写人 = 记录当前时间段未提交的人数");
+      var resWeek = this.fillByWeek(currentjqInfo);
+      console.log("resWeek: ", resWeek)
+      currentDay = resWeek[0];
+    }
     console.log(currentDay, currentjqInfo)
     var filledUserId = currentjqInfo[currentDay] || [];
     var list = currentjqInfo.list;
@@ -341,8 +341,14 @@ Page({
   },
   goBack: function () {
     console.log("coredata back")
-    wx.navigateBack({
-      delta: 1
+    wx.switchTab({
+      url: '../home/index',
     })
   },
+
+  createJQ() {
+    wx.navigateTo({
+      url: '../ques/index',
+    })
+  }
 })

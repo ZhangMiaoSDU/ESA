@@ -1,5 +1,5 @@
 var dataUrl = "https://lab.ahusmart.com/nCoV/";
-
+// var dataUrl = "https://lab.isaaclin.cn/nCoV/";
 export function initChosen() {
   return new Promise((resolve, reject) => {
     wx.request({
@@ -34,6 +34,7 @@ export function initCoreData(province) {
         },
         success: res => {
           if (res.data.success) {
+            console.log(res.data.results)
             resolve(res.data.results);
           }
         },

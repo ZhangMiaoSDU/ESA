@@ -280,7 +280,7 @@ Page({
   },
 
   bindCourseChange(e) {
-    // console.log(e);
+    console.log(e);
     let checkedCourses = e.detail.value;
     if (checkedCourses.length == 0) {
       this.setData({ isCheckedCourse: false })
@@ -452,9 +452,9 @@ Page({
     
   },
   saveUnivColl(info) {
-    var univ = this.data.univ;
-    var coll = this.data.coll;
-    var _class = this.data._class
+    var univ = info.univ;
+    var coll = info.coll;
+    var _class = info._class
     console.log(univ, coll);
     if (univ.trim() == '' || coll.trim() == '' || _class.trim() == '') {
       // wx.showToast({

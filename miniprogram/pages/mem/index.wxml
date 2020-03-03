@@ -1,0 +1,53 @@
+<!--pages/mem/index.wxml-->
+<view>
+  <view class="header" bindtap="createGroup">
+    <view class="image">
+      <image src="{{images.addM}}" style="width: 60rpx; height: 60rpx"></image>
+    </view>
+    <view class="text create">创建组</view>
+  </view>
+
+  <view class="list">
+    <block wx:for="{{groupsInfo}}" wx:key="index">
+      <view class="item">
+        <view class="image">
+          <image src="{{images._class}}" style="width: 60rpx; height: 60rpx"></image>
+        </view>
+        <view class="item-wrapper">
+          <view style="color: #333; font-size:28rpx" class="ellipsis">{{item.name}}</view>
+          <view style="font-size: 25rpx; display:flex; align-items: center;justify-content: space-between ">
+            <view class="left-detail">
+              <text>{{item.id}}</text>
+              <text class="copytext" data-gid="{{item.id}}" bindtap="copyGID">复制组ID</text>
+            </view>
+            <view class="right-detail">
+              <view class="right-item">
+                <button class="share-btn" style="width:40rpx;" open-type="share" data-gid="{{item.id}}" data-name="{{item.name}}">
+                  <image src="{{images.share}}"></image>
+                </button>
+                <text style="color: rgba(47, 127, 240, .8);">邀请</text>
+              </view>
+              <view class="right-item" data-gid="{{item.id}}" bindtap="viewGroup">
+                <image src="{{images.view}}"></image>
+                <text style="color: rgba(47, 127, 240, .8);">查看成员</text>
+              </view>
+              <view class="right-item" data-gid="{{item.id}}" bindtap="deleteGroup">
+                <image src="{{images.delete1}}"></image>
+                <text style="color: #d81e06">删除</text>
+              </view>
+            </view>
+          </view>
+          <view>
+
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
+
+
+
+
+
+

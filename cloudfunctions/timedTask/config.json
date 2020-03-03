@@ -3,7 +3,7 @@
     {
       "name": "timedTask",
       "type": "timer",
-      "config": "0 0 2 1 * * *"
+      "config": "0 */5 * * * * *"
     }
   ],
   "permissions": {

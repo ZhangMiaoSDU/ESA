@@ -25,6 +25,11 @@ module.exports = {
   ex: path + 'ex.jpg',
   close: path + 'close.png', //#d81e06
   ques: path + 'ques.png',
-  sharebg: path + '9cefd907a32b25b2878c343322bbd00a.jpg'
+  sharebg: path + '9cefd907a32b25b2878c343322bbd00a.jpg',
+  addM: path + 'addM.png', //#1296db
+  _class: path + 'class.png',
+  view: path + 'view.png',
+  selectCircle: path + "select-circle.png", //#989898
+  selected: path + 'selected.png',
 }
 

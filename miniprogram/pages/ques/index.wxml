@@ -76,11 +76,25 @@
           style="width: 40rpx; height: 40rpx; margin:0 20rpx"></image>
           <view catchtap="checkEx" style="color: #0FB148;font-size: 24rpx;">查看示例</view>
         </view>
+        <view style="margin: 20rpx; align-items: flex-end">
+          <text>第三种方式：</text>
+          <text style="color: #0FB148;" catchtap="chooseGroup" wx:if="{{!selectedGroup}}">选择群组</text>
+          <text wx:if="{{selectedGroup}}">选择群组({{selectedGroup.length}})</text>
+          <scroll-view scroll-y class="groups">
+            <block wx:for="{{selectedGroup}}" wx:key="index">
+              <view>
+                <text>{{item.name}}</text>
+                <text data-gid="{{item.id}}" catchtap="removeGroup" 
+                style="color: #d81e06;margin: 0 5px;wxcs_style_margin: 0 10rpx;">删除</text>
+              </view>
+            </block>
+          </scroll-view>
+        </view>
       </view>
       
       <view  class="mask-item">
         <view style="flex: 3;">应填人数(选填)</view>
-        <input bindinput="bindNum" style="text-align: center" value="{{number}}人"></input>
+        <input bindinput="bindNum" style="text-align: center" value="{{number ? number :0}}人"></input>
       </view>
     </view>
     <view class="next-btn btn" catchtap="create">
@@ -118,7 +132,7 @@
         <view class="table-tr">
           <view class="table-td">{{item.name}}</view>
           <view class="table-td">{{item.phone}}</view>
-          <view class="table-td" data-id="{{item.id}}" bindtap="deleteMember">
+          <view class="table-td" data-idTime="{{item.idTime}}" data-id="{{item.id}}" bindtap="deleteMember">
             <image src="{{images._delete}}" style="width: 40rpx; height: 40rpx"></image>
           </view>
         </view>

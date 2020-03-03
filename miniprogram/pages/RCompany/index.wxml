@@ -1,0 +1,82 @@
+<!--pages/RCompany/index.wxml-->
+<view class='base_registerWrap'>
+  <view class="base-title">创建组</view>
+  <view class="ant-form">
+    <view class="item pos">
+      <view class="ant-form-item-label">学校全称</view>
+      <view class="ant-form-item-wrapper">
+        <view class="ant-input-wrapper">
+          <input wx:if="{{showUInput}}" 
+          focus="true"
+          bindinput="bindUniv" 
+          bindblur="bindblurUniv"
+          value="{{univ}}" 
+          placeholder="(必填)请填写大学全称"></input>
+        </view>
+        <picker value="{{univ}}" range="{{univs}}" bindchange="bindUnivChange" class="picker">
+          <view class="picker-view">
+            <view wx:if="{{!showUInput}}">{{univ ? univ : '必填'}}</view>
+            <image src="{{images.arrow}}" class="img"></image>
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="item pos">
+      <view class="ant-form-item-label">学院全称</view> 
+      <view class="ant-form-item-wrapper">
+        <view  class="ant-input-wrapper">
+          <input wx:if="{{showCInput}}" 
+          focus="true"
+          bindinput="bindColl" 
+          value="{{coll}}"
+          placeholder="(必填)请填写学院全称"/>
+        </view>
+        <picker value="{{coll}}" range="{{colls}}" bindchange="bindCollChange" class="picker">
+          <view class="picker-view">
+            <view wx:if="{{!showCInput}}">{{coll ? coll : '必填'}}</view>
+            <image src="{{images.arrow}}" class="img"></image>
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="item pos">
+      <view class="ant-form-item-label">班级</view> 
+      <view class="ant-form-item-wrapper">
+        <view  class="ant-input-wrapper">
+          <input wx:if="{{showClassInput}}" 
+          focus="true"
+          bindinput="bindClass" 
+          value="{{_class}}"
+          placeholder="(必填)请填写班级名称"/>
+        </view>
+        <picker value="{{_class}}" range="{{_classes}}" bindchange="bindClassChange" class="picker">
+          <view class="picker-view">
+            <view wx:if="{{!showClassInput}}">{{_class ? _class : '必填'}}</view>
+            <image src="{{images.arrow}}" class="img"></image>
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="item">
+      <view class="ant-form-item-label">邮箱</view> 
+      <view  class="ant-input-wrapper">
+        <input
+        bindinput="bindEmail" 
+        value="{{uemail}}"
+        placeholder="请输入邮箱（必填）"/>
+      </view>
+    </view>
+    <view class="item">
+      <view class="ant-form-item-label">联系电话</view> 
+      <view  class="ant-input-wrapper">
+        <input
+        bindinput="bindPhone" 
+        value="{{uphone}}"
+        placeholder="请输入联系电话"/>
+      </view>
+    </view>
+    <view class="item" style="margin-top: 100rpx; border:none">
+      <button bindtap="confirmCreate">确认创建</button>
+    </view>
+  </view>
+</view>

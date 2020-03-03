@@ -7,6 +7,7 @@
  */
 const app = getApp();
 const images = require('../../utils/images.js');
+const utils = require('../../utils/utils.js');
 const db = wx.cloud.database();
 const questionDB = db.collection('question');
 const jqDB = db.collection('jq');
@@ -27,8 +28,10 @@ const requiredQuestionId = [
 ];
 function timestampToTime(timestamp) {
   const date = new Date(timestamp)
-  return `${date.getFullYear()}/${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}/${date.getDate()}`
+  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}`
 }
+
+
 Page({
   data: {
     screenWidth: app.globalData.screenWidth,
@@ -80,12 +83,6 @@ Page({
         let questionsInfo = res;
         console.log("deleteQuestion =======> questionsInfo", questionsInfo)
         _this.setData({ questionsInfo: questionsInfo });
-        // Promise.all(res).then(res => {
-        //   console.log(res);
-        //   wx.hideLoading();
-        //   let questionsInfo = res.map(item => { return item.data });
-        //   _this.setData({ questionsInfo: questionsInfo })
-        // })
       });
     }).catch(res => {console.log(res)})
   },
@@ -132,31 +129,6 @@ Page({
         })
       }
     })
-    
-    /*this.loadQuestion().then((tasks) => {
-      console.log(tasks)
-      Promise.all(tasks).then(res => {
-        console.log(res); //该问卷的所有问题信息
-        let questionsInfo = res.map(item => {return item.data});
-        console.log("onShow =======> questionsInfo", questionsInfo)
-        _this.setData({ questionsInfo: questionsInfo});
-        //  
-        if (!this.data.editing) {
-          userDB.doc(app.globalData.openid).get().then(res => {
-            // console.log(res)
-            var userInfo = res.data;
-            (_this.data.jqInfo.questions || []).map(quesId => {
-              // console.log(quesId)
-              if (userInfo[quesId] || userInfo[quesId] == 0) {
-                answerInfo[quesId] = userInfo[quesId];
-                // console.log(answerInfo)
-                _this.setData({ answerInfo: answerInfo })
-              }
-            })
-          })
-        }
-      })
-    })*/
   },
   loadQuestion() {
     let _this = this;
@@ -389,19 +361,85 @@ Page({
     answerInfo[id] = Number(checkedValue);
     console.log(answerInfo)
     this.setData({ answerInfo: answerInfo })
+  }, 
+  submitJQByOneTime() {
+    var jqInfo = this.data.jqInfo;
+    var deadline = jqInfo.deadline;//一次性文问卷截止日期
+    var saveDate = deadline.split('-').join("/");
+    return saveDate;
   },
 
+  submitJQByMonth() {
+    var jqInfo = this.data.jqInfo;
+    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
+    console.log("startTime: ", startTime);
+    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
+    let endTime;
+    var deadlineTime = timestampToTime(deadline)
+    endTime = deadlineTime;
+    console.log("endTime: ", endTime)
+    var day = jqInfo.date;
+    var dateList = utils.formatEveryMonthDay(startTime, endTime, day);
+    console.log(dateList, startTime, endTime, day)
+    let currentDay;
+    var now = new Date().getTime();//当前时间戳
+    for (let i = 0; i < dateList.length - 1; i++) {
+      var dateTimestamp = new Date(dateList[i]).getTime();
+      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
+      if (now >= dateTimestamp && now < nextdateTimestamp) {
+        currentDay = dateList[i];
+      }
+      if (now >= dateTimestamp && !nextdateTimestamp) {
+        currentDay = dateList[i];
+      }
+    }
+    return currentDay;
+  },
 
+  submitByWeek() {
+    var jqInfo = this.data.jqInfo;
+    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
+    console.log("startTime: ", startTime);
+    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
+    let endTime;
+    var deadlineTime = timestampToTime(deadline)
+    endTime = deadlineTime;
+    console.log("endTime: ", endTime)
+    var selectedDay = jqInfo.selectedDay;
+    var dateList = utils.formatEveryWeekDay(startTime, endTime, selectedDay);
+    console.log(dateList)
+    var currentDay;
+    var now = new Date().getTime();//当前时间戳
+    for (let i = 0; i < dateList.length; i++) {
+      var dateTimestamp = new Date(dateList[i]).getTime();
+      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
+      if (now >= dateTimestamp && now < nextdateTimestamp) {
+        currentDay = dateList[i]
+      }
+      if (now >= dateTimestamp && !nextdateTimestamp) {
+        currentDay = dateList[i];
+      }
+    }
+    return currentDay;
+  },
   submitJQ() {
-    let sendEmailTime = this.data.jqInfo.remodeDetail; //记录邮件的发送时间
-    let csTime = [new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()].join('/') 
-      + ' ' + sendEmailTime[0] + ":" + sendEmailTime[1];
-    let isoTime = new Date(csTime).toISOString().split('T')[0].split('-').join('/'); //格式："2020/02/16"
+    var currentDay = timestampToTime(new Date().getTime()).split('-').join('/');
+    var jqInfo = this.data.jqInfo;
+    if (jqInfo.type == 0) {
+      currentDay = this.submitJQByOneTime();
+    }
+    if (jqInfo.type == 1) {
+      currentDay = this.submitJQByMonth();
+    }
+    if (jqInfo.type == 3) {
+      currentDay = this.submitByWeek();
+    }
+    console.log(jqInfo.type, "================> currentDay: ", currentDay);
+    // return;
     let userId = app.globalData.openid;
     let answerInfo = this.data.answerInfo;
-    
     let jqId = this.data.jqid;
-    let jqSummarys = this.data.jqInfo.jqSummarys ? this.data.jqInfo.jqSummarys : [];
+    let jqSummarys = jqInfo.jqSummarys ? jqInfo.jqSummarys : [];
     let isExist = false;
     jqSummarys.map(item => {
       if (item.userid == userId) {
@@ -440,9 +478,9 @@ Page({
     let summary = {};
     // summary[userId] = answerInfo;
     summary[userId] = {};
-    summary[userId][isoTime] = answerInfo;
+    summary[userId][currentDay] = answerInfo;
 
-    console.log("Summary: ", summary);
+    console.log("Summary: ", JSON.stringify(summary));
     wx.showLoading({
       title: '加载中',
     })
@@ -456,7 +494,6 @@ Page({
         userId: userId
       }
     }))
-    let currentDay = timestampToTime(new Date().getTime());
     var usersId;
     if (this.data.jqInfo[currentDay]) {
       console.log("存在字段");

@@ -32,27 +32,27 @@ exports.main = async (event, context) => {
     tasks.push(db.collection("question").doc(requiredQuestionId[i]).get())
   }
   let questionsRes = await Promise.all(tasks);
-  console.log(questionsRes)
+  // console.log(questionsRes)
   let questionsInfo = questionsRes.map(item => { return item.data });
-  console.log(questionsInfo);
+  // console.log(questionsInfo);
 
   const execTasks = []; //待执行任务栈
   // 1.查询是否有异常数据。
   let jqRes = await db.collection(COLLECTIONNAME).limit(100).get()
   let jqs = jqRes.data;
-  jqs = jqs.filter(item => { return item._id == "e30d61715e4e20250161479b12d633df"})
+  // jqs = jqs.filter(item => { return item._id == "e30d61715e4e20250161479b12d633df"})
   for (let i = 0; i < jqs.length; i++) {
     let jqInfo = jqs[i];
     let todayFilledId = jqInfo[isoTime] || [];
-    console.log(todayFilledId)
+    // console.log(todayFilledId)
     let tasksUser = [];
     for (let i = 0; i < todayFilledId.length; i++) {
       tasksUser.push(db.collection("user").doc(todayFilledId[i]).get())
     }
     let usersRes = await Promise.all(tasksUser);
-    console.log(usersRes)
+    // console.log(usersRes)
     let todayFilledInfos = usersRes.map(item => { return item.data });
-    console.log("todayFilledInfo: ", todayFilledInfos);
+    // console.log("todayFilledInfo: ", todayFilledInfos);
 
     todayFilledInfos.map(filledInfo => {
       let filledId = filledInfo._id;//今日填写调查的成员id
@@ -67,7 +67,8 @@ exports.main = async (event, context) => {
             let options = questionInfo.options;
             let optionanswer = options[filledAnswer[questionInfo._id]]
             console.log('questionInfo.type == 0 ------------> answer: ', optionanswer)
-            if (optionanswer == '是') {
+            if (optionanswer == '是' && filledId != 'ogesF5pzNo3t7xjTxA5o4HtHcmqM') {
+              console.log("==============添加在校异常情况==============")
               execTasks.push({
                 userName: filledInfo.name,
                 userClass: filledInfo._class || '未填写',
@@ -88,6 +89,8 @@ exports.main = async (event, context) => {
             let optionanswer = options[filledAnswer[questionInfo._id]]
             console.log('questionInfo.type == 0 ------------> answer: ', optionanswer)
             if (optionanswer != '健康') {
+              console.log("==============添加健康异常情况==============")
+
               execTasks.push({
                 userName: filledInfo.name,
                 userClass: filledInfo._class || '未填写',
@@ -108,6 +111,8 @@ exports.main = async (event, context) => {
             let optionanswer = options[filledAnswer[questionInfo._id]]
             console.log('questionInfo.type == 0 ------------> answer: ', optionanswer)
             if (optionanswer != '正常') {
+              console.log("==============添加本人异常情况==============")
+
               execTasks.push({
                 userName: filledInfo.name,
                 userClass: filledInfo._class || '未填写',
@@ -150,6 +155,8 @@ exports.main = async (event, context) => {
             let optionanswer = options[filledAnswer[questionInfo._id]]
             console.log('questionInfo.type == 0 ------------> answer: ', optionanswer)
             if (optionanswer == '是') {
+              console.log("==============添加接触异常情况==============")
+
               execTasks.push({
                 userName: filledInfo.name,
                 situation: '曾接触聚集性发病的患者.',
@@ -170,6 +177,8 @@ exports.main = async (event, context) => {
             let optionanswer = options[filledAnswer[questionInfo._id]]
             console.log('questionInfo.type == 0 ------------> answer: ', optionanswer)
             if (optionanswer == '是') {
+              console.log("==============添加湖北异常情况==============")
+
               execTasks.push({
                 userName: filledInfo.name,
                 situation: '与湖北有关.',
@@ -190,6 +199,8 @@ exports.main = async (event, context) => {
             let optionanswer = options[filledAnswer[questionInfo._id]]
             console.log('questionInfo.type == 0 ------------> answer: ', optionanswer)
             if (optionanswer == '是') {
+              console.log("==============添加报告病例社区异常情况==============")
+
               execTasks.push({
                 userName: filledInfo.name,
                 situation: '与报告病例社区有关.',
@@ -207,6 +218,8 @@ exports.main = async (event, context) => {
         }
       }
       if (temperature) {
+        console.log("==============添加体温异常情况==============")
+
         execTasks.push({
           userName: filledInfo.name,
           situation: '体温情况异常。',
@@ -222,26 +235,32 @@ exports.main = async (event, context) => {
       }
     })
   }
-  console.log(execTasks);
+  console.log(execTasks.length);
   // 3.处理待执行任务，依次发送通知
   for (let i = 0; i < execTasks.length; i++) {
     let task = execTasks[i];
     const alert = require('alert.js');
-
+    console.log(`-------------------------------${task.userName}--------------------------------------`)
     try {
-      await alert.alert(task.jqid, task.creator, task.userName, task.situation, task.userClass,);
+      console.log(`----creator:----${task.creator}----`)
+      await alert.alert(task.jqid, task.creator, task.userName, task.situation, task.userClass);
+      console.log(`----secCreator:----${task.secCreator}----`)
       await alert.alert(task.jqid, task.secCreator, task.userName, task.situation, task.userClass);
+      console.log(`----_3rdCreator:----${task._3rdCreator}----`)
       await alert.alert(task.jqid, task._3rdCreator, task.userName, task.situation, task.userClass);
     } catch (e) {
       console.error(e)
     }
 
     const sendEmail = require('sendEmail.js')
+    console.log(`----email:----${task.email}----`)
     await sendEmail.sendEmail(task.userName, task.situation, task.userClass, task.email)
     if (task.secEmail && task.secEmail.trim() != '') {
+      console.log(`----secEmail:----${task.secEmail}----`)
       await sendEmail.sendEmail(task.userName, task.situation, task.userClass, task.secEmail)
     }
     if (task._3rdEmail && task._3rdEmail.trim() != '') {
+      console.log(`----_3rdEmail:----${task._3rdEmail}----`)
       await sendEmail.sendEmail(task.userName, task.situation, task.userClass, task._3rdEmail)
     }
   }

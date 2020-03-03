@@ -61,8 +61,14 @@ Page({
   },
   initNews() {
     let _this = this
-    wxrequest.initNews().then(res => {
-      // console.log(res);
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initNews: true }
+    })
+    // wxrequest.initNews()
+    .then(res => {
+      res = res.result;
+      console.log(res);
       wx.hideLoading();
       res.map(item => { return item.time = utils.formatDate(item.pubDate) })
       _this.setData({ news: res })
@@ -71,8 +77,14 @@ Page({
 
   initRumors() {
     let _this = this;
-    wxrequest.initRumors().then(res => {
-      // console.log("initRumors: ", res);
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initRumors: true }
+    })
+    // wxrequest.initRumors()
+    .then(res => {
+      res = res.result;
+      console.log("initRumors: ", res);
       let rumors = []
       let id = 0;
       for (let i = 0; i < res.length; i++) {

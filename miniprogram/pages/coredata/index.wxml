@@ -7,22 +7,23 @@
   </view>
   <view class="content" style="margin-top:{{statusBarHeight + navigatorH}}px">  
     <!-- <view bindtap="loadJQ">query</view> -->
-    <scroll-view scroll-y style="height: {{windowHeight}}px" class="lists">
+    <scroll-view wx:if="{{jqs.length > 0}}" scroll-y style="height: {{windowHeight}}px" class="lists">
       <block wx:for="{{jqs}}" wx:key="index">
         <view class="item" style="position: relative;">
-          <view class="labeltext">{{item.type == 0 ? '一次性' : item.type == 1 ? '按月' : '按日'}}</view>
+          <view class="labeltext">{{item.type == 0 ? '一次性' : item.type == 1 ? '按月' : item.type == 2 ? '按日' : '按周'}}</view>
           <view class="detail">
             <view style="display: flex;justify-content: space-between;">
-              <view style="height: 120rpx;line-height: 60rpx; width:{{screenWidth-70}}px" 
+              <view style="height: 120rpx; width:{{screenWidth-70}}px" 
               catchtap="getJQDetail" data-num="{{item.questions.length}}" data-id="{{item._id}}">
-                <view style="display: flex">
+                <view style="display: flex; align-items: center;">
                   <view>{{item.name}}</view>
                   <view style="font-size: 24rpx; margin-left: 40rpx">ID:{{item.creationTime}}</view>
                 </view>
+                <view wx:if='{{item.period}}' style="font-size: 20rpx;">{{item.period[0]}}<text wx:if='{{item.period[1]}}'> - {{item.period[1]}}</text></view>
                 <view style="font-size: 24rpx;">
                   <view wx:if="{{item.required || item.required == 0}}">
                     <text class="label label-warning">应填人数({{item.required}})</text>
-                    <text class="label label-success" catchtap="viewfilled" data-id="{{item._id}}" style="margin: 0 5rpx"> 今日已填人数({{item.filled}})</text>
+                    <text class="label label-success" catchtap="viewfilled" data-id="{{item._id}}" style="margin: 0 5rpx"> 已填人数({{item.filled}})</text>
                     <text class="label label-danger" catchtap="viewUnfilled" data-id="{{item._id}}">查看未填</text>
                   </view>
                 </view>
@@ -38,8 +39,14 @@
         </view>
       </block>
     </scroll-view>
+    <view wx:if="{{jqs.length == 0}}" style="text-align: center;padding: 26px 0;font-size: 30rpx;">
+      您当前没有可查看报表，可以前往<text style="color: rgb(15, 177, 72);" bindtap="createJQ">创建调查</text>。
+    </view>
   </view>
 </view>
+
+
+
 
 
 <view class="mask" wx:if="{{showMask}}">
@@ -55,19 +62,5 @@
 </view>
 
 
-<!-- <view class="mask">
-  <view class="mask-content">
-    <view>选择日期</view>
-    <view class="mask-list">
-      <view class="mask-item">
-        <view>2020-02-16</view>
-        <image src='{{images.download}}' style="width: 30px; height: 30px"></image>
-      </view>
-      <view class="mask-item">
-        <view>2020-02-17</view>
-        <image src='{{images.download}}' style="width: 30px; height: 30px"></image>
-      </view>
-    </view>
-  </view>
-</view> -->
+
 

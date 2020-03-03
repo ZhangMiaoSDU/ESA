@@ -2,29 +2,30 @@
 <view class="container">
   <view class="navBar" style="padding-top: {{statusBarHeight}}px;height: {{navigatorH}}px; width: {{screenWidth}}px">
     <view class="left" style="justify-content: space-between">
-      <view class="icon-back back-btn" bindtap="goBack">返回主页</view>
+      <view class="icon-back back-btn" bindtap="goBack" wx:if="{{!view}}">返回主页</view>
+      <view class="icon-back back-btn" bindtap="goBack" wx:else>返回</view>
     </view>
   </view>
   <view class="list" style="margin-top:{{statusBarHeight + navigatorH}}px">
     <view class="item">
       <text>姓名</text>
       <view class='right'>
-        <view>{{userInfo.name}}</view>        
-        <image data-label="姓名" catchtap="showMask" src="{{images.arrow}}"></image>
+        <view>{{userInfo.name || '未填写'}}</view>        
+        <image data-label="姓名" catchtap="showMask" src="{{images.arrow}}" wx:if="{{!view}}"></image>
       </view>
     </view>
     <view class="item">
       <text>手机号码</text> 
       <view class='right'>
-        <view>{{userInfo.phone}}</view>        
-        <image data-label="手机号码" catchtap="showMask"  src="{{images.arrow}}"></image>
+        <view>{{userInfo.phone || '未填写'}}</view>        
+        <image data-label="手机号码" catchtap="showMask"  src="{{images.arrow}}" wx:if="{{!view}}"></image>
       </view>
     </view>
     <view class="item">
       <text>QQ</text> 
       <view class='right'>
-        <view>{{userInfo.QQ}}</view>
-        <image  data-label="QQ"  catchtap="showMask"  src="{{images.arrow}}"></image>
+        <view>{{userInfo.QQ || '未填写'}}</view>
+        <image  data-label="QQ"  catchtap="showMask"  src="{{images.arrow}}" wx:if="{{!view}}"></image>
       </view>
     </view>
     <view class="item pos">
@@ -32,7 +33,7 @@
       <picker value="{{userInfo.univ}}" range="{{univs}}" bindchange="bindUnivChange" class="picker">
         <view class="picker-view">
           <view>{{userInfo.univ ? userInfo.univ : '未填写'}}</view>
-          <image data-label="学校"  src="{{images.arrow}}"></image>
+          <image data-label="学校"  src="{{images.arrow}}" wx:if="{{!view}}"></image>
         </view>
       </picker>
     </view>
@@ -41,7 +42,7 @@
       <picker value="{{userInfo.coll}}" range="{{colls}}" bindchange="bindCollChange" class="picker">
         <view class="picker-view">
           <view>{{userInfo.coll ? userInfo.coll : '未填写'}}</view>
-          <image  data-label="学院"  src="{{images.arrow}}"></image>
+          <image  data-label="学院"  src="{{images.arrow}}" wx:if="{{!view}}"></image>
         </view>
       </picker>
     </view>
@@ -50,7 +51,7 @@
       <picker value="{{userInfo._class}}" range="{{_classes}}" bindchange="bindClassChange" class="picker">
         <view class="picker-view">
           <view>{{userInfo._class ? userInfo._class : '未填写'}}</view>
-          <image  data-label="班级" src="{{images.arrow}}"></image>
+          <image  data-label="班级" src="{{images.arrow}}" wx:if="{{!view}}"></image>
         </view>
       </picker>
     </view>
@@ -58,7 +59,7 @@
       <text>学号/工号</text> 
       <view class="right">
         <view>{{userInfo.stdID ? userInfo.stdID : '未填写'}}</view>
-        <image  data-label="学号"  catchtap="showMask"  src="{{images.arrow}}"></image>
+        <image  data-label="学号"  catchtap="showMask"  src="{{images.arrow}}" wx:if="{{!view}}"></image>
       </view>
     </view>
     <view class="item">
@@ -67,9 +68,21 @@
         <view data-index="1"  class="ellipsis" style="width: {{screenWidth-150}}px">
           {{userInfo.currentLocation ? userInfo.currentLocation: '未填写'}}
         </view>
-        <image bindtap="chooseLocation" data-label="住址" src="{{images.arrow}}"></image>
+        <image bindtap="chooseLocation" data-label="住址" src="{{images.arrow}}" wx:if="{{!view}}"></image>
       </view>
       
+    </view>
+    <view class="item pos" wx:if="{{view && hasPermission}}">
+      <view>身份</view> 
+      <picker value="{{userInfo.identity}}" range="{{identities}}" bindchange="bindIdentityChange" class="picker">
+        <view class="picker-view">
+          <view>{{userInfo.identity}}</view>
+          <image  data-label="班级" src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+    </view>
+    <view class="item btnview" wx:if="{{view && hasPermission}}">
+      <button bindtap="deleteMember">删除成员</button>
     </view>
   </view>
 </view>

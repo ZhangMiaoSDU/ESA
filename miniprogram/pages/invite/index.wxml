@@ -1,0 +1,29 @@
+<!--pages/invite/index.wxml-->
+<view  wx:if="{{!isJoin}}">
+  <view style="margin-bottom: 100rpx;">
+    <view style="text-align: center;margin-top: 100rpx;">
+      <image src="{{invitorInfo.userHeader}}" style="width: 100rpx;height: 100rpx;"></image>
+      <view style="font-size: 30rpx;margin: 30rpx;">{{invitorInfo.name}}</view>
+    </view>
+    <view style="font-size: 30rpx;text-align: center;color: #333;">
+      <view>邀请您加入群组</view>
+      <view>"{{groupInfo.name}}"</view>
+    </view>
+  </view>
+  <view class="btn-view" style="background: #fff;margin: 40rpx;">
+    <view class="btn" bindtap="confirmJoin">确认加入</view>
+  </view>
+</view>
+
+
+<view wx:if="{{isJoin}}" class="container tip">
+  <view class="mcontent">
+    <view style="padding: 60rpx;">
+      <image style="width: 60rpx;height: 60rpx;" src="{{images.success}}"></image>
+    </view>
+    <view style="color: rgb(15, 177, 72);font-size: 30rpx;">
+      <view>您已加入该群组</view> 
+      <view style="margin: 10rpx;"><text style="font-weight: 500;" catchtap="goback">点击返回主页</text>。</view>
+    </view>
+  </view>
+</view>

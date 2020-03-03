@@ -21,6 +21,13 @@ page {
   background: #fff;
   padding-bottom: 10rpx;
 }
+.create.btn-view .btn {
+  border-radius: 25px;
+  font-size: 28rpx;
+  height: 65rpx;
+  line-height: 65rpx;
+}
+
 
 .lists {
   height: 100%;
@@ -67,5 +74,9 @@ page {
   margin-left: 10rpx;
 }
 
-
+.groups {
+  font-size: 22rpx;
+  margin-left: 50rpx;
+  height: 60rpx
+}
 

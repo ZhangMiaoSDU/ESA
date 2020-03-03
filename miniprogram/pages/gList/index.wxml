@@ -1,0 +1,50 @@
+<!--pages/gList/index.wxml-->
+<view>
+  <view class="list">
+    <block wx:for="{{groupsInfo}}" wx:key="index">
+      <view class="item">
+        <view class="item-wrapper">
+          <view class="item-detail">
+            <view style="color: #333;" class="ellipsis">{{item.name}}</view>
+            <view style="color: rgba(47, 127, 240, .8);" data-gid="{{item.id}}" bindtap="viewGroup">
+              查看成员
+            </view>
+          </view>
+          <view class="selectbtn" data-gid="{{item.id}}" bindtap="changeStatu">
+            <image src="{{item.isChecked ? images.selected : images.selectCircle}}" 
+            style="width: 30rpx;height: 30rpx"></image>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <view class="confirmbtn" bindtap="confirm">
+    确定({{selectedGroup.length}})
+  </view>
+</view>
+
+<view class="mask" wx:if="{{viewGroup}}">
+  <view class="mask-content" style="height: 80%; width: 85%; font-size: 28rpx;">
+    <scroll-view scroll-y style="height:80%" >
+      <view style="text-align: center;font-size: 30rpx;margin: 10rpx;">
+        该群组中共有{{membersInfo.length}}人
+      </view>
+      <view class="table">
+        <view class="table-tr" style="background: rgb(241,241,241);">
+          <view class="table-th" style="color: #2c2c2c; width:none">姓名</view>
+          <view class="table-th" style="color: #2c2c2c; width:none">手机号</view>
+        </view>
+        <block wx:for="{{membersInfo}}" wx:key="index">
+          <view class="table-tr">
+            <view class="table-td">{{item.name}}</view>
+            <view class="table-td">{{item.phone}}</view>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+    <view class="close">
+      <image src="{{images.close}}" catchtap="closeMask" style="width: 50rpx; height: 50rpx;"/>
+    </view>
+  </view>
+</view>

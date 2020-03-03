@@ -17,6 +17,7 @@ var config = {
 // 创建一个SMTP客户端对象 task.userName, task.situation, task.userClass, task.secEmail
 var transporter = nodemailer.createTransport(config);
 const sendEmail = async (userName, situation, userClass, email) => {
+  // console.log(`----${emailemail}-----`)
   const text = `
     您好，${userClass}的同学${userName}: ${situation}。
   `

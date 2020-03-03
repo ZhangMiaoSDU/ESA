@@ -1,7 +1,7 @@
 <!--pages/award/index.wxml-->
 <view wx:if="{{!isFill}}" class="container"  style="position: relative; height: {{windowHeight - 90}}px">
   <!-- <view bindtap="doClick">chooseAddress</view> -->
-  <view class="heading">注册领奖学金</view>
+  <view class="heading">注册</view>
   <scroll-view scroll-y class="content list"  style="padding-bottom: 100rpx; height: {{windowHeight - 220}}px">
     <view class="idcard" bindtap="doClick">
       <image src="{{images.camera}}"></image>
@@ -98,7 +98,7 @@
       <view>所在班级</view> 
       <input wx:if="{{showClassInput}}" bindinput="bindClass" value="{{_class}}"
         style="width: 50%"
-        placeholder="(必填)请填写学院全称"/>
+        placeholder="必填"/>
       <picker value="{{_class}}" range="{{_classes}}" bindchange="bindClassChange" class="picker">
         <view class="picker-view">
           <view wx:if="{{!showClassInput}}">{{_class ? _class : '必填'}}</view>
@@ -112,63 +112,6 @@
       <input bindinput="bindStdID" placeholder="必填（若无，填写0）" value="{{stdID}}"></input>
     </view>
 
-     <view>
-      <view>* 您是否愿意领取100元现金奖学金，参加以下40小时的腾讯课堂直播课？(可多选)</view>
-      <checkbox-group bindchange="bindCourseChange" style="display: flex;flex-direction: column;"> 
-        <label class="checkbox course">
-          <checkbox value="手绘设计训练" />
-          <view>手绘设计训练</view>
-        </label>
-        <label class="checkbox course">
-          <checkbox value="平面设计和用户界面设计" />
-          <view>平面设计和用户界面设计</view>
-        </label>
-        <label class="checkbox course">
-          <checkbox value="HTML5及微信小程序开发" />
-          <view>HTML5及微信小程序开发</view>
-        </label>
-        <label class="checkbox course">
-          <checkbox value="Java软件工程及游戏开发" />
-          <view>Java软件工程及游戏开发</view>
-        </label>
-        <label class="checkbox course">
-          <checkbox value="数据结构与算法" />
-          <view>数据结构与算法</view>
-        </label>
-        <label class="checkbox course">
-          <checkbox value="“蓝桥杯” 全国软件和信息技术专业人才大赛培训" />
-          <view>“蓝桥杯”全国软件和信息技术专业人才大赛培训</view>
-        </label>
-      </checkbox-group>
-    </view>
-
-    
-    
-    <view>
-      <checkbox-group bindchange="bindCommitment" style="display: flex;flex-direction: column;"> 
-        <label class="checkbox course">
-          <checkbox value="0" disabled="{{!isCheckedCourse}}"/>
-          <view>我承诺领取现金奖学金后一定会上对应的腾讯课堂直播课。</view>
-        </label>
-        <label class="checkbox course">
-          <checkbox value="1" disabled="{{!isCheckedCourse}}"/>
-          <view>我知道不履行上述承诺将损害我的个人信用，并被追究相关法律责任。</view>
-        </label>
-      </checkbox-group>
-    </view>
-
-    <view>
-    注明：开课时间在2月下旬或3月初，一个月内上完，由广州叩丁狼资深设计师/工程师授课，有班主任在线辅导，课程结束并通过考核后可发实训证书。
-    </view>
-
-    <view>
-      <checkbox-group bindchange="bindNo">
-        <label class="checkbox course">
-          <checkbox value="2" disabled="{{isCheckedCourse}}" />
-          <view>不感兴趣，不领取该奖学金。</view>
-        </label>
-      </checkbox-group>
-    </view>
 
   </scroll-view>
 

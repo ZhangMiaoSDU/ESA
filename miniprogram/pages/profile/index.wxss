@@ -45,3 +45,13 @@
   height: 100%;
   line-height: 80rpx;
 }
+
+.item button {
+  padding: 0;
+  color: #d81e06;
+}
+
+.item.btnview {
+  margin-top: 100rpx;
+  border: 0.5px solid #f1f1f1;
+}

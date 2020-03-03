@@ -4,74 +4,95 @@ const rq = require('request-promise')
 const COLLECTIONNAME = 'timedtask'
 cloud.init({env: 'esa'})
 const db = cloud.database();
+
+
 // 云函数入口函数
 exports.main = async (event, context) => {
-  const execTasks = [
-   
-  ]; // 待执行任务栈
-  const sendEmailTasks = [
-    // {
-    //   _id: '',
-    //   jqid: "f5f6a9235e4c9fd100be0a6a3adeb5f3",
-    //   mail: "2549360836@qq.com",
-    //   name: "Q1",
-    // }
+  let assignedTask = [];
+  let execTasks = []; // 待执行任务栈
+  let sendEmailTasks = [
   ]; //需要发送邮件的任务栈
-  const deletTasks = []; //需要删除的任务栈
+  let deletTasks = []; //需要删除的任务栈
   // 1.查询是否有定时任务。（timeingTask)集合是否有数据。
   let taskRes = await db.collection(COLLECTIONNAME).limit(100).get()
   let tasks = taskRes.data;
-  console.log(taskRes)
+  // console.log(taskRes)
   // 2.查询定时任务的类型。
   // console.log(new Date().getTime())
   var tiemStamp = new Date().getTime();
   var currentDate = new Date(tiemStamp).getDate(), currentHour = new Date(tiemStamp).getHours(), currentMinute = new Date(tiemStamp).getMinutes();
-
+  var currentDay = new Date(tiemStamp).getDay();
   console.log("tiemStamp: ", tiemStamp, currentDate, currentHour, currentMinute)
   try {
     for (let i = 0; i < tasks.length; i++) {
       let taskType = tasks[i].taskType;
-      let isoModeDetail = tasks[i].isoModeDetail;
-      let isoDeadline = tasks[i].isoDeadLine;
-      let isoDeadlineDate = isoDeadline[0];
-      let isoReDetail = tasks[i].isoReDetail;
       if (taskType == 0) {
-        console.log("一次性问卷");
-        var alertreHour = isoReDetail[0];
-        var alertreMinute = isoReDetail[1];
-        console.log(alertreHour, alertreMinute, currentHour)
-        if (currentHour == alertreHour && isoDeadlineDate == currentDate) {
+        console.log("一次性问卷", tasks[i]._id);
+        // 处理提醒事件
+        var isoTimeHour = tasks[i].isoTimeHour;
+        // 小时对应
+        if (currentHour == isoTimeHour) {
+          console.log("一次性问卷 添加一条提醒任务,isoTimeHour, currentHour\n", isoTimeHour, currentHour);
+          execTasks.push(tasks[i])
+        }
+        // 处理邮件时间
+        var isoRetimeDate = tasks[i].isoRetimeDate;
+        var isoRetimeHour = tasks[i].isoRetimeHour;
+        // 小时对应，且提醒日对应
+        if (currentHour == isoRetimeHour && isoRetimeDate == currentDate) {
+          console.log("一次性问卷 添加一条邮件任务, isoRetimeDate, currentDate, isoRetimeHour, currentHour\n", isoRetimeDate, currentDate, isoRetimeHour, currentHour);
           sendEmailTasks.push(tasks[i])
         }
-        // console.log(sendEmailTasks)
       } else if (taskType == 1) {
-        console.log("按月通知");
-        console.log([currentDate, currentHour, currentMinute], isoModeDetail)
-        // 如果当前的月份，时间和既定的月份时间相同，则将其认为是要执行的任务；
-        var alertDate = isoModeDetail[0];
-        var alertHour = isoModeDetail[1];
-        var alertMinute = isoModeDetail[2];
-        if (currentDate == alertDate && currentHour == alertHour) {
+        console.log("按月通知", tasks[i]._id);
+        // 处理提醒事件
+        var isoTimeDate = tasks[i].isoTimeDate;
+        var isoTimeHour = tasks[i].isoTimeHour;
+        // 小时对应，且提醒日对应
+        if (currentHour == isoTimeHour && isoTimeDate == currentDate) {
+          console.log("按月通知 添加一条提醒任务,isoTimeDate, currentDate, isoTimeHour, currentHour\n", isoTimeDate, currentDate, isoTimeHour, currentHour);
           execTasks.push(tasks[i])
-        } 
-        var alertreDate = isoReDetail[0];
-        var alertreHour = isoReDetail[1];
-        var alertreMinute = isoReDetail[2];
-        if (currentDate == alertreDate && currentHour == alertreHour) {
+        }
+        // 处理邮件时间
+        var isoRetimeDate = tasks[i].isoRetimeDate;
+        var isoRetimeHour = tasks[i].isoRetimeHour;
+        // 小时对应，且提醒日对应
+        if (currentHour == isoRetimeHour && isoRetimeDate == currentDate) {
+          console.log("按月通知 添加一条邮件任务, isoRetimeDate, currentDate, isoRetimeHour, currentHour\n", isoRetimeDate, currentDate, isoRetimeHour, currentHour);
           sendEmailTasks.push(tasks[i])
         }
       } else if (taskType == 2) {
-        console.log("每日通知");
-        console.log([currentDate, currentHour, currentMinute], isoModeDetail)
-        // 如果当前的时间和既定的通知时间相同，则将其列为要执行的任务；
-        var alertHour = isoModeDetail[0];
-        var alertMinute = isoModeDetail[1];
-        if (currentHour == alertHour) {
+        console.log("每日通知", tasks[i]._id);
+        // 处理提醒事件
+        var isoTimeHour = tasks[i].isoTimeHour;
+        // 小时对应
+        if (currentHour == isoTimeHour) {
+          console.log("每日通知 添加一条提醒任务,isoTimeHour, currentHour\n", isoTimeHour, currentHour);
           execTasks.push(tasks[i])
         }
-        var alertreHour = isoReDetail[0];
-        var alertreMinute = isoReDetail[1];
-        if (currentHour == alertreHour) {
+        // 处理邮件时间
+        var isoRetimeHour = tasks[i].isoRetimeHour;
+        // 小时对应
+        if (currentHour == isoRetimeHour) {
+          console.log("每日通知 添加一条邮件任务, isoRetimeHour, currentHour\n", isoRetimeHour, currentHour);
+          sendEmailTasks.push(tasks[i])
+        }
+      } else if (taskType == 3) {
+        console.log("按周通知", tasks[i]._id);
+        // 处理提醒事件
+        var isoSelectedDay = tasks[i].isoSelectedDay;
+        var isoTimeHour = tasks[i].isoTimeHour;
+        // 小时对应，且提醒日对应
+        if (currentHour == isoTimeHour && isoSelectedDay.indexOf(currentDay) != -1) {
+          console.log("按周通知 添加一条提醒任务, currentHour, isoTimeHour, isoSelectedDay, currentDay\n", currentHour, isoTimeHour, isoSelectedDay, currentDay);
+          execTasks.push(tasks[i])
+        }
+        // 处理邮件事件
+        var isoReSelectedDay = tasks[i].isoReSelectedDay;
+        var isoRetimeHour = tasks[i].isoRetimeHour;
+        // 小时对应，且提醒日对应
+        if (currentHour == isoRetimeHour && isoReSelectedDay.indexOf(currentDay) != -1) {
+          console.log("按周通知 添加一条邮件任务, currentHour, isoTimeHour, isoSelectedDay, currentDay\n", currentHour, isoRetimeHour, isoReSelectedDay, currentDay);
           sendEmailTasks.push(tasks[i])
         }
       }
@@ -81,13 +102,15 @@ exports.main = async (event, context) => {
       let deadlineTimestamp = new Date(deadline.join('/')).getTime() + 28800000;
       console.log("deadlineTimestamp: ", deadlineTimestamp, new Date().getTime());
       if (new Date().getTime() > deadlineTimestamp) {
-        console.log("已到截止日期")
+        console.log("已到截止日期", tasks[i]._id, deadline)
         deletTasks.push(tasks[i])
       }
     }
   } catch (e) {
     console.error(e)
   }
+  // execTasks = [];
+  
   // 3.处理待执行任务，依次发送通知
   for (let i = 0; i < execTasks.length; i++) {
     let task = execTasks[i];
@@ -98,13 +121,34 @@ exports.main = async (event, context) => {
       console.error(e)
     }
   }
+  for (let i = 0; i < assignedTask.length; i++) {
+    let task = assignedTask[i];
+    const sendEmail = require('sendEmail.js')
+    try {
+      let mail = 'liangguo349@163.com';
+      // console.log(sendEmailTasks) 
+      let res = await sendEmail.sendEmail(task.jqid, task.name, mail);
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  // sendEmailTasks = [
+  //   {
+  //     _id: '',
+  //     jqid: "7d79e8035e4eac9701a42a146735458b",
+  //     mail: "2549360836@qq.com",
+  //     name: "Q1",
+  //   }
+  // ]
+  
   // 处理需要发送邮件的任务
   for (let i = 0; i < sendEmailTasks.length; i++) {
-    let task = sendEmailTasks[0];
+    let task = sendEmailTasks[i];
     const sendEmail = require('sendEmail.js')
     try {
       // console.log(sendEmailTasks) 
-      await sendEmail.sendEmail(task.jqid, task.name, task.mail)
+      let res = await sendEmail.sendEmail(task.jqid, task.name, task.mail);
+      console.log(res)
       if (task.secEmail && task.secEmail.trim() != '') {
         await sendEmail.sendEmail(task.jqid, task.name, task.secEmail)
       }
@@ -112,7 +156,7 @@ exports.main = async (event, context) => {
       console.error(e)
     }
   }
-
+  // deletTasks = []
   // 删除任务
   for (let i = 0; i < deletTasks.length; i++) {
     let task = deletTasks[i];

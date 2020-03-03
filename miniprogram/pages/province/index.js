@@ -448,7 +448,13 @@ Page({
   onLoad: function (options) {
     let _this = this;
     // 全国
-    wxrequest.initCoreData().then(res => {
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initCoreData: true }
+    })
+    // wxrequest.initCoreData()
+    .then(res => {
+      res = res.result;
       // console.log(res);
       _this.setData({
         confirmA: res[0].confirmedCount,
@@ -457,7 +463,13 @@ Page({
       })
     })
     _this.initAddChart();
-    wxrequest.initChosen().then(res => {
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initChosen: true }
+    })
+    // wxrequest.initChosen()
+    .then(res => {
+      res = res.result;
       _this.setData({ provinces: res })
     })
     _this.initCoreData('湖北省');
@@ -469,7 +481,13 @@ Page({
     wx.showLoading({
       title: '加载中',
     })
-    wxrequest.initCoreData(province).then(res => {
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initCoreData: true, province: province }
+    })
+    // wxrequest.initCoreData(province)
+    .then(res => {
+      res = res.result;
       console.log(res)
       wx.hideLoading();
       _this.setData({ cities: res[0].cities})
@@ -496,7 +514,13 @@ Page({
       title: '加载中',
     })
     let _this = this;
-    wxrequest.initChart(province).then(res => {
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initChart: true, province: province }
+    })
+    // wxrequest.initChart(province)
+    .then(res => {
+      res = res.result;
       wx.hideLoading()
       let chartData = res;
       var dateTrend = [];
@@ -559,9 +583,15 @@ Page({
       title: '加载中',
     })
     let _this = this;
-    wxrequest.initChart().then(res => {
+    wx.cloud.callFunction({
+      name: 'wxrequest',
+      data: { initChart: true }
+    })
+    // wxrequest.initChart()
+    .then(res => {
       wx.hideLoading();
-      console.log(res)
+      console.log(res);
+      res = res.result;
       let chartData = res;
       let date = [];
       let dateA = [];
@@ -606,7 +636,7 @@ Page({
         // console.log("key: ", key)
         dataNCoVOrdered[key] = dataNCov1[key];
       });
-
+      console.log("initAddChart ================> ", dataNCoVOrdered)
       // use data
       for (let i in dataNCoVOrdered) {
         // console.log("i: ", i)
@@ -654,7 +684,10 @@ Page({
     if (index == 0) {
       this.initAddChart();
     } else {
-      this.initChart('湖北省')
+      var pindex = this.data.index;
+      var provinces = this.data.provinces;
+      var currentProvince = provinces[pindex]
+      this.initChart(currentProvince)
     }
   }
 })

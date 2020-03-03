@@ -12,6 +12,7 @@ let month = new Date().getMonth() + 1;
 let day = new Date().getDate();
 const db = cloud.database()
 const alert = async (jqid, creator, userName, situation, userClass) => {
+  
   // 根据活动id，获取参与用户信息，获取到用户的 openid 和 formid. task.jqid, task.creator, task.userName, task.situation, 
   // let jqRes = await db.collection(COLLECTIONNAME).doc(jqid).get();
   // console.log(jqRes)

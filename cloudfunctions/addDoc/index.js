@@ -43,5 +43,15 @@ exports.main = async (event, context) => {
     return await intStdDB.add({
       data: event.data
     })
-  } 
+  } else if (event.addGroup) {
+    var data = event.data;
+    var gid = data.id;
+    let gres = await db.collection('group').where({id: gid}).get();
+    if (gres.data.length == 1) {
+      return new Promise((resolve, reject) => {resolve(0)});
+    }
+    return await db.collection('group').add({
+      data: event.data
+    })
+  }
 }

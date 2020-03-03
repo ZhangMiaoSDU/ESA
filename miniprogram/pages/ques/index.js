@@ -55,6 +55,7 @@ Page({
   },
   onShow() {
     let _this = this;
+    
     this.loadJQ().then(res => {
       let jqs = res.result ? res.result.data : [];
       jqs.map(jq => {
@@ -62,7 +63,16 @@ Page({
         jq.userNum = jq.jqSummarys ? jq.jqSummarys.length : 0;
       })
       _this.setData({ jqs: res.result ? res.result.data : [] })
-    })
+    });
+    // 选择群组后
+    if (this.data.selectedGroup) {
+      console.log("onshow =====> this.data.selectedGroup: ", this.data.selectedGroup);
+      var selectedGroup = this.data.selectedGroup;
+      var list = [];
+      selectedGroup.map(item => {list = list.concat(item.list)});
+      var number = list.length;
+      this.setData({list: list, number: number})
+    }
   },
   createJQ: function() {
     this.setData({
@@ -73,7 +83,10 @@ Page({
   cancelCreate(e){
     // console.log(e)
     this.setData({
-      showMask: false
+      showMask: false,
+      selectedGroup: null,
+      number: null,
+      list: null
     })
   },
 
@@ -118,8 +131,8 @@ Page({
   },
   goBack: function () {
     console.log("ques back")
-    wx.navigateBack({
-      delta: 1
+    wx.switchTab({
+      url: '../home/index',
     })
   },
   toJQ(e) {
@@ -205,7 +218,7 @@ Page({
                 list.push({
                   name: dataArr[i].split('\t')[0],
                   phone: dataArr[i].split('\t')[1].trim(),
-                  id: new Date().getTime() + list.length
+                  idTime: new Date().getTime() + list.length
                 })
               }
             }
@@ -283,7 +296,7 @@ Page({
       return;
     }
 
-    addMemberInfo.id = new Date().getTime() + list.length;
+    addMemberInfo.idTime = new Date().getTime() + list.length;
     count = count + 1;
     this.setData({count: count})
     list.push(addMemberInfo);
@@ -295,8 +308,18 @@ Page({
     console.log(this.data.list)
   },
   deleteMember(e) {
-    let memberid = e.currentTarget.dataset.id;
-    var list = this.data.list.filter(item => {return item.id != memberid});
+    console.log(e)
+    let idtime = e.currentTarget.dataset.idtime;
+    var id = e.currentTarget.dataset.id;
+    var list;
+    if (idtime) {
+      console.log("第一种方式和第二种方式")
+      list = this.data.list.filter(item => { return item.idTime != Number(idtime) });      
+    } else if (id) {
+      console.log("第三种方式")
+      list = this.data.list.filter(item => { return item.id != id });
+    }
+    console.log(list)
     this.setData({list: list, number: list.length})
     wx.showToast({
       title: `删除成功！`,
@@ -318,5 +341,32 @@ Page({
       success: res => { console.log(res) },
       fail: res => { console.log(res) }
     });
+  },
+  chooseGroup() {
+    if (this.data.selectedGroup) {
+      var gids = this.data.selectedGroup.map(item => {return item.id});
+      var gidsStr = JSON.stringify(gids);
+      wx.navigateTo({
+        url: '../gList/index?gids=' + gidsStr,
+      });
+      return;
+    }
+    wx.navigateTo({
+      url: '../gList/index',
+    })
+  },
+  removeGroup(e) {
+    var gid = e.currentTarget.dataset.gid;
+    var selectedGroup = this.data.selectedGroup;
+    var removedGroup = selectedGroup.filter(item => { return item.id == gid })[0];
+    console.log(removedGroup)
+    var removedList = removedGroup.listid;
+    var list = this.data.list;
+    list = list.filter(item => {if (removedList.indexOf(item.id) == -1) {return item}});
+    var number = list.length;
+    this.setData({ list: list, number: number })
+    
+    selectedGroup = selectedGroup.filter(item => {return item.id != gid});
+    this.setData({ selectedGroup: selectedGroup});    
   }
 })

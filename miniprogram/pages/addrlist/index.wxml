@@ -1,0 +1,27 @@
+<!--pages/addrlist/index.wxml-->
+<view>
+  <view class="list">
+    <block wx:for="{{membersInfo}}" wx:key="index">
+      <view class="item" bindtap="viewProfile" data-uid="{{item._id}}">
+        <view class="image">
+          <image src="{{item.userHeader}}"></image>
+        </view>
+        <view class="text create">
+          <text>{{item.name}}</text>
+          <text wx:if="{{item.isCreator}}" class="item-label">创建人</text>
+          <text wx:if="{{item.isAdmin && !item.isCreator}}" class="item-label">管理员</text>
+        </view>
+      </view>
+    </block>
+  </view>
+  <view class="header item" bindtap="addMember">
+    <view class="image">
+      <image src="{{images.addM}}" style="width: 60rpx; height: 60rpx"></image>
+    </view>
+    <view class="text create">添加成员</view>
+  </view>
+</view>
+
+
+
+

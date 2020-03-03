@@ -1,6 +1,7 @@
 // pages/jqStat/index.js
 const app = getApp();
 var wxCharts = require('../../utils/wxcharts.js');
+
 // var chart = require('../../utils/chart.js')
 const utils = require("../../utils/utils.js")
 const db = wx.cloud.database();
@@ -9,30 +10,9 @@ const questionDB = db.collection('question')
 import * as echarts from '../../components/ec-canvas/echarts';
 var columnChart = [];
 
-function getDate(datestr) {
-  var temp = datestr.split("-");
-  var date = new Date(temp[0], temp[1] - 1, temp[2]);
-  return date;
-}
-
-function formatEveryDay(start, end) {
-  let dateList = [];
-  var startTime = getDate(start);
-  var endTime = getDate(end);
-
-  while ((endTime.getTime() - startTime.getTime()) >= 0) {
-    var year = startTime.getFullYear();
-    var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
-    var day = startTime.getDate().toString().length == 1 ? "0" + startTime.getDate() : startTime.getDate();
-    dateList.push(year + "-" + month + "-" + day);
-    startTime.setDate(startTime.getDate() + 1);
-  }
-  return dateList;
-}
-
 function timestampToTime(timestamp) {
   const date = new Date(timestamp)
-  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate()}`
+  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}`
 }
 
 Page({
@@ -63,22 +43,53 @@ Page({
       } else {
         end = jqInfo.deadline
       }
-      // end = jqInfo.deadline
-      let dateList = formatEveryDay(start, end);
+      let dateList = utils.formatEveryDay(start, end);
+
+      if (jqInfo.type == 0) {
+        console.log("一次性");
+        dateList = [deadline];
+        dateList = [`${start.split('-').join('/')}-${deadline}`]
+      }
       if (jqInfo.type == 1) {
         console.log("按月");
-        var alertDate = jqInfo.modeDetail[0];
-        dateList = dateList.filter(item => {
-          return item.split('/')[2] == alertDate;
-        })
+        var date = jqInfo.date;
+        dateList = utils.formatEveryMonthDay(start, jqInfo.deadline, date);
+        if (dateList.length > 1) {
+          dateList = dateList.map((item, index) => { 
+            if (index < dateList.length - 1) { 
+              return dateList[index] + '-' + dateList[index + 1] 
+            } else { return item + '-' + deadline } 
+          }); 
+        }
+        if (dateList.length == 1) {
+          dateList = [`${dateList[0]}-${deadline}`]
+        }
+        if (dateList.length == 0) {
+          dateList = [`${start.split('-').join('/')}-${deadline}`]
+        }
+
+      }
+      if (jqInfo.type == 3) {
+        console.log("按周");
+        var selectedDay = jqInfo.selectedDay;
+        dateList = utils.formatEveryWeekDay(start, jqInfo.deadline, selectedDay);
+        if (dateList.length > 1) {
+          dateList = dateList.map((item, index) => { 
+            if (index < dateList.length - 1) { 
+              return dateList[index] + '-' + dateList[index + 1] 
+            } else { return item + '-' + deadline} 
+          });
+        }
+        if (dateList.length == 1) {
+          dateList = [`${dateList[0]}-${deadline}`]
+        }
+        if (dateList.length == 0) {
+          dateList = [`${start.split('-').join('/')}-${deadline}`]
+        }
       }
       _this.setData({ dateList: dateList})
       console.log(start, end, '\n', dateList);
       let allAnswer = _this.formatSummary(jqInfo)
-      // .then(res => {
-      //   console.log(res);
-        
-      // });
       _this.setData({ summary: allAnswer });
     })
   },
@@ -115,9 +126,7 @@ Page({
   formatSummary(jqInfo) {
     let questionDict = {};
     let allAnswer = [];
-    
     let _this = this;
-
     let jqUser = jqInfo.jqUser || [];
     let sendEmailTime = jqInfo.remodeDetail;
     let jqQuestions = jqInfo.questions || [];//该问卷的所有id
@@ -139,11 +148,20 @@ Page({
     questionsInfo.map(item => {
       questionDict[item._id] = { content: item.content, type: item.type, options: item.options ? item.options : [], answers: [] }
     });
-    let selectTime = this.data.dateList[this.data.index].split('-') + ' ' + sendEmailTime[0] + ':' + sendEmailTime[1];
-    let selectTimeISO = new Date(selectTime).toISOString().split('T')[0].split('-').join('/'); //格式："2020/02/16"
-    console.log("selectTime: ", selectTime, "selectTimeISO: ", selectTimeISO)
+    var dateList = this.data.dateList;
+    var dateindex = this.data.index
+    let selectTime = dateList[dateindex];
+    console.log("selectTime: ", selectTime)
+    if (jqInfo.type == 1 || jqInfo.type == 3) {
+      selectTime = selectTime.split('-')[0]
+    }
+    if(jqInfo.type == 0) {
+      selectTime = selectTime.split('-')[1]
+    }
+    // let selectTimeISO = new Date(selectTime).toISOString().split('T')[0].split('-').join('/'); //格式："2020/02/16"
+    console.log("selectTime: ", selectTime)
     jqUser.map(userId => {
-      let userAnswer = jqInfo[userId][selectTimeISO];
+      let userAnswer = jqInfo[userId][selectTime];
       console.log("user: ", userAnswer)
       if (userAnswer) {
         userAnswer['id'] = userId;
@@ -178,54 +196,6 @@ Page({
     _this.setData({ questionDict: questionDict });
     allAnswer.sort((a, b) => b.submitTime - a.submitTime)
     return allAnswer;
-    /*console.log(questions);
-    let tasks = this.loadQuestions(questions);
-    
-    return new Promise((resolve, reject) => {
-      Promise.all(tasks).then(res => {
-        let questionsInfo = res.map(item => { return item.data })
-        questionsInfo.map(item => {
-          questionDict[item._id] = { content: item.content, type: item.type, options: item.options ? item.options : [], answers:[] }
-        });
-        // console.log(questionDict);
-        jqUser.map(userId => {
-          let userAnswer = jqInfo[userId][selectTimeISO];
-          console.log("user: ", userAnswer)
-          if (userAnswer) {
-            userAnswer['id'] = userId;
-            userAnswer['time'] = utils.formatDate(userAnswer.submitTime);
-            userAnswer['qa'] = [];
-            let count = 0;
-            for (let key in questionDict) {
-              if (userAnswer[key] != undefined) {
-                // console.log(questionDict[key])
-                questionDict[key].answers.push(userAnswer[key]);
-                let qc = questionDict[key].content;
-                if (questionDict[key].type == 1) {
-                  userAnswer['qa'].push({ question: qc, answer: userAnswer[key] })
-                } else {
-                  questionDict[key].index = count;
-                  count += 1
-                  var index = userAnswer[key];
-                  userAnswer['qa'].push({ question: qc, answer: questionDict[key].options[index] })
-                }
-              } else {
-                userAnswer['qa'].push({ question: questionDict[key].content, answer: '(空)' });
-                // console.log("KEY:", key, questionDict[key])
-              }
-            }
-            // console.log("userAnswer: ", userAnswer)
-            allAnswer.push(userAnswer)//当有答案时添加
-          } 
-          
-        })
-        console.log("questionDict: ", questionDict)
-        _this.setData({ questionDict: questionDict});
-        allAnswer.sort((a, b) => b.submitTime - a.submitTime)
-        resolve(allAnswer);
-      })
-      .catch(res => reject(res))
-    })*/ 
   },
   viewChart(e) {
     let questionDict = this.data.questionDict;

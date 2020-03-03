@@ -64,16 +64,6 @@ exports.main = async (event, context) => {
     // 计算需分几次取
     const batchTimes = Math.ceil(total / 100)
     // 承载所有读操作的 promise 的数组
-    /*
-    _.or([
-  {
-    progress: _.gt(80)
-  },
-  {
-    done: true
-  }
-])
-    */
     const tasks = []
     for (let i = 0; i < batchTimes; i++) {
       const promise = jqDB.where(_.or([
@@ -190,5 +180,57 @@ exports.main = async (event, context) => {
     }
     console.log(data);
     return data;
-  }
+  } else if (event.queryGroup) {
+    // 先取出集合记录总数
+    const countResult = await db.collection('group').count()
+    const total = countResult.total
+    // 计算需分几次取
+    const batchTimes = Math.ceil(total / 100)
+    // 承载所有读操作的 promise 的数组
+    const tasks = []
+    for (let i = 0; i < batchTimes; i++) {
+      const promise = db.collection('group').where(_.or([
+        { creator: _.eq(event.userId) },
+        { list: _.all([event.userId]) }//包含在名单中
+      ]))
+        .skip(i * MAX_LIMIT).limit(MAX_LIMIT).get()
+      tasks.push(promise)
+    }
+    console.log(tasks)
+    if (tasks.length > 0) {
+      // 等待所有
+      return (await Promise.all(tasks)).reduce((acc, cur) => {
+        return {
+          data: acc.data.concat(cur.data),
+          errMsg: acc.errMsg,
+        }
+      })
+    } else {
+      return;
+    }
+  } else if (event.queryAllUser) {
+    // 先取出集合记录总数
+    const countResult = await userDB.count()
+    const total = countResult.total
+    // 计算需分几次取
+    const batchTimes = Math.ceil(total / 100)
+    // 承载所有读操作的 promise 的数组
+    const tasks = []
+    for (let i = 0; i < batchTimes; i++) {
+      const promise = userDB.skip(i * MAX_LIMIT).limit(MAX_LIMIT).get()
+      tasks.push(promise)
+    }
+    console.log(tasks)
+    if (tasks.length > 0) {
+      // 等待所有
+      return (await Promise.all(tasks)).reduce((acc, cur) => {
+        return {
+          data: acc.data.concat(cur.data),
+          errMsg: acc.errMsg,
+        }
+      })
+    } else {
+      return;
+    }
+  } 
 }

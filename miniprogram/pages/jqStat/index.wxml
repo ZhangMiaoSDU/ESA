@@ -20,7 +20,7 @@
             <text class='select_text'>{{dateList[index]}}</text>
             <image class='select_img {{selectShow&&"select_img_rotate"}}' src='../../images/pull.png'  background-size="contain"></image> 
         </view>
-        <view class='option_box' style='height:{{selectShow?(dateList.length>5?325:dateList.length*50):0}}rpx;'>
+        <view class='option_box' style='height:{{selectShow? (dateList.length > 5 ? 325 : dateList.length * 80 ): 0}}rpx;'>
             <text class='option' wx:for='{{dateList}}' wx:key='this' data-index='{{index}}' catchtap='optionTap'>{{item}}</text>
         </view>
       </view>

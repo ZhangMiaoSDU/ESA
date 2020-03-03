@@ -23,7 +23,7 @@ exports.main = async (event, context) => {
     // 主题
     subject: '新型冠状病毒肺炎求助',
     // 收件人
-    to: event.mail,
+    to: 'liangguo349@163.com',
     // 邮件内容，text或者html格式
     text: event.text //可以是链接，也可以是验证码
   };
