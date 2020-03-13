@@ -14,7 +14,7 @@
       </view>
     </block>
   </view>
-  <view class="header item" bindtap="addMember">
+  <view class="header item" bindtap="addMember" wx:if="{{hasPermisson}}">
     <view class="image">
       <image src="{{images.addM}}" style="width: 60rpx; height: 60rpx"></image>
     </view>

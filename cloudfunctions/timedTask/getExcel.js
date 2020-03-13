@@ -21,25 +21,18 @@ function formatData(questionsInfo, usersInfo, jqInfo) {
   let gmtTime = getFTime();
   console.log("gmtTime: ", gmtTime)
   let count = jqInfo.count;
-  // var type = jqInfo.type;
-  // if (type == 1) {
-  //   console.log("按月");
-  //   var date = jqInfo.date;
-  //   if (Number(gmtTime[2]) >= date) {
-  //     gmtTime[2] = date < 10 ? '0' + date : date;
-  //   } else {
-  //     gmtTime[1] = Number(gmtTime[1]) - 1 < 10 ? '0' + (Number(gmtTime[1]) - 1) : Number(gmtTime[1]) - 1;
-  //     var dayCount = new Date(gmtTime[0], gmtTime[1], 0).getDate();
-  //     if (date > dayCount) {
-  //       gmtTime[2] = dayCount
-  //     } else {
-  //       gmtTime[2] = date < 10 ? '0' + date : date
-  //     }
-  //   }
-  // }
   gmtTime = gmtTime.join('/');
   console.log(gmtTime);
-  return;
+  if (jqInfo.type == 1) {
+    console.log("按月：", jqInfo._id);
+    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
+  }
+  if (jqInfo.type == 3) {
+    console.log("按周：", jqInfo._id);
+    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
+    console.log("gmtTime : ", gmtTime)
+  }
+  // return;
   let questionDict = {};
   let header = [];
   header.push('用户');
@@ -51,11 +44,11 @@ function formatData(questionsInfo, usersInfo, jqInfo) {
     header.push(item.content)
   })
   // console.log("questionDict: ", questionDict);
-  let pTemOptions = questionDict['032032b3-62d9-48d4-8589-e28ac7b29465'].options || [];//上午温度是否超过37.3
-  let aTemOptions = questionDict['72529d59-22a5-4fcc-8ea6-556ee62f7283'].options || [];//下午温度是否超过37.3
-  let clocationOptions = questionDict['8727263e-fb7e-450e-ab95-44a68f3d1bd4'].options || [];//目前所在地
-  let isOutOptions = questionDict['4908cf0f-5596-497c-94a1-0fd7cde3a44f'].options || [];//是否外出
-  let healthOptions = questionDict['a0a9b783-1201-4410-b358-88807a57c943'].options || [];//今日健康状况
+  // let pTemOptions = questionDict['032032b3-62d9-48d4-8589-e28ac7b29465'].options || [];//上午温度是否超过37.3
+  // let aTemOptions = questionDict['72529d59-22a5-4fcc-8ea6-556ee62f7283'].options || [];//下午温度是否超过37.3
+  // let clocationOptions = questionDict['8727263e-fb7e-450e-ab95-44a68f3d1bd4'].options || [];//目前所在地
+  // let isOutOptions = questionDict['4908cf0f-5596-497c-94a1-0fd7cde3a44f'].options || [];//是否外出
+  // let healthOptions = questionDict['a0a9b783-1201-4410-b358-88807a57c943'].options || [];//今日健康状况
   let allUsersSummary = []
   allUsersSummary.push(header)
   usersInfo.map(userInfo => {
@@ -69,11 +62,11 @@ function formatData(questionsInfo, usersInfo, jqInfo) {
     _array.push(userInfo._class);
     // console.log(userAnswer);
     var leastAnswer = userAnswer[gmtTime] || {};
-    let pTemp = pTemOptions[leastAnswer['032032b3-62d9-48d4-8589-e28ac7b29465']]; // 是 / 否
-    let aTemp = aTemOptions[leastAnswer['72529d59-22a5-4fcc-8ea6-556ee62f7283']]; // 是 / 否
-    let clocation = clocationOptions[leastAnswer['8727263e-fb7e-450e-ab95-44a68f3d1bd4']];// 国内 / 国外
-    let isOut = isOutOptions[leastAnswer['4908cf0f-5596-497c-94a1-0fd7cde3a44f']]; // 是 / 否
-    let health = healthOptions[leastAnswer['a0a9b783-1201-4410-b358-88807a57c943']]; // 健康 / 发烧 / 咳嗽/。。。。
+    // let pTemp = pTemOptions[leastAnswer['032032b3-62d9-48d4-8589-e28ac7b29465']]; // 是 / 否
+    // let aTemp = aTemOptions[leastAnswer['72529d59-22a5-4fcc-8ea6-556ee62f7283']]; // 是 / 否
+    // let clocation = clocationOptions[leastAnswer['8727263e-fb7e-450e-ab95-44a68f3d1bd4']];// 国内 / 国外
+    // let isOut = isOutOptions[leastAnswer['4908cf0f-5596-497c-94a1-0fd7cde3a44f']]; // 是 / 否
+    // let health = healthOptions[leastAnswer['a0a9b783-1201-4410-b358-88807a57c943']]; // 健康 / 发烧 / 咳嗽/。。。。
     // console.log("leastAnswer: ", leastAnswer) 
     // if (leastAnswer['032032b3-62d9-48d4-8589-e28ac7b29465']) 
     for (let key in questionDict) {
@@ -104,8 +97,6 @@ function formatData(questionsInfo, usersInfo, jqInfo) {
             console.log("没有外出")
             leastAnswer[key] = ' '
           }
-
-         
           if (key == "63201958-91a3-47c0-bab6-cab9c661b625" && leastAnswer[key] == '无') {
             console.log("当日活动情况与地点");
             leastAnswer[key] = ' '
@@ -139,7 +130,25 @@ const getExcel = async id => {
   // 格式化数据
   let jqRes = await db.collection(COLLECTIONNAME).doc(id).get();
   let jqInfo = jqRes.data;
-  let jqUser = jqInfo.jqUser || [];
+  let jqUser;
+  
+  let gmtTime = getFTime();
+  console.log("gmtTime: ", gmtTime)
+  let count = jqInfo.count;
+  gmtTime = gmtTime.join('/');
+  console.log(gmtTime);
+  jqUser = jqInfo[gmtTime] || jqInfo.jqUser || [];
+  if (jqInfo.type == 1) {
+    console.log("按月：", jqInfo._id);
+    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
+    jqUser = jqInfo[gmtTime] || []
+  }
+  if (jqInfo.type == 3) {
+    console.log("按周：", jqInfo._id);
+    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
+    console.log("gmtTime : ", gmtTime);
+    jqUser = jqInfo[gmtTime] || [];
+  }
   let tasksUser = [];
   for (let i = 0; i < jqUser.length; i++) {
     tasksUser.push(db.collection("user").doc(jqUser[i]).get())

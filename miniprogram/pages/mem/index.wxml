@@ -31,7 +31,7 @@
                 <image src="{{images.view}}"></image>
                 <text style="color: rgba(47, 127, 240, .8);">查看成员</text>
               </view>
-              <view class="right-item" data-gid="{{item.id}}" bindtap="deleteGroup">
+              <view class="right-item" data-gid="{{item.id}}" data-creator="{{item.creator}}" bindtap="deleteGroup">
                 <image src="{{images.delete1}}"></image>
                 <text style="color: #d81e06">删除</text>
               </view>

@@ -231,7 +231,7 @@ Page({
     let jqid = e.target.dataset.jqid;
     return {
       title: '分享报表统计结果',
-      path: '/pages/jqStat/index?id=' + jqid,
+      path: '/pages/jqStat/index?share=0&id=' + jqid,
       imageUrl: this.data.images.sharebg,
       success: res => { console.log(res) },
       fail: res => { console.log(res) }

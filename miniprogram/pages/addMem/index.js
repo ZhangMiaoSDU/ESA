@@ -29,6 +29,7 @@ Page({
       })
     })
   },
+
   loadGroup(gid) {
     return new Promise((resolve,reject) => {
       groupDB.where({id: gid}).get().then(res => {
@@ -36,6 +37,7 @@ Page({
       }).catch(res => reject(res))
     })
   },
+
   loadAllUser() {
     return new Promise((resolve, reject) => {
       wx.cloud.callFunction({
@@ -50,6 +52,7 @@ Page({
         .catch(res => {console.log(res); reject(res) })
     })
   },
+
   addThisUser(e) {
     var _this = this;
     var gid = this.data.gid;
@@ -79,6 +82,7 @@ Page({
     })
     .catch(res => {console.log(res)})
   },
+  
   showSearch() {
     this.setData({showSearch: true})
   },

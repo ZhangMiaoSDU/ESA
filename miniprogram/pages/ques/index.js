@@ -147,7 +147,7 @@ Page({
     let jqName = e.target.dataset.name;
     return {
       title: '分享调查问卷',
-      path: '/pages/createJQ/index?jq=' + jqName + '&id=' + jqid,
+      path: '/pages/createJQ/index?share=0&jq=' + jqName + '&id=' + jqid,
       imageUrl: this.data.images.sharebg,
       success: res => {console.log(res)},
       fail: res => {console.log(res)}

@@ -191,7 +191,7 @@ exports.main = async (event, context) => {
     for (let i = 0; i < batchTimes; i++) {
       const promise = db.collection('group').where(_.or([
         { creator: _.eq(event.userId) },
-        { list: _.all([event.userId]) }//包含在名单中
+        { listid: _.all([event.userId]) }//包含在名单中
       ]))
         .skip(i * MAX_LIMIT).limit(MAX_LIMIT).get()
       tasks.push(promise)

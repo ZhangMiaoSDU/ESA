@@ -88,8 +88,8 @@ Page({
   },
   onLoad: function (options) {
     let _this = this;
-    
     console.log(options)
+    if (options.share) { this.setData({ share: true }) };
     let jq = options.jq;
     this.setData({ title: jq, jqid: options.id});
     if (options.editing) { this.setData({ editing: true})}
@@ -125,7 +125,7 @@ Page({
             }
           })
           console.log(answerInfo)
-          _this.setData({ answerInfo: answerInfo })
+          _this.setData({ answerInfo: answerInfo, userInfo: userInfo })
         })
       }
     })
@@ -537,15 +537,52 @@ Page({
         id: userId,
         jqid: jqId
       }
-    }))
+    }));
+    // 查看该用的id是否在应填名单中，如不在，将其加入；
+    var list = jqInfo.list;
+    var listid = list.map(item => {return item.id}).filter(item =>{return item});
+    var listphone = list.map(item => {return item.phone});
+    console.log("listphone==========>", listphone)
+    var uinfo = this.data.userInfo;
+    if (listid.indexOf(app.globalData.openid) == -1) {
+      var phone = uinfo.phone || '';
+      var index = phone == '' ? listphone.indexOf(phone) : -1;
+      if (index != -1) {
+        console.log("有该用户的手机号")
+        list[index].id = app.globalData.openid;
+      } else {
+        console.log("没有该用户，手机号")
+        var info = {
+          id: uinfo.openid,
+          phone: uinfo.phone,
+          name: uinfo.name
+        }
+        list.push(info)
+      }
+      tasks.push(wx.cloud.callFunction({
+        name: 'updateDoc',
+        data: {
+          updateList: true,
+          jqid: jqInfo._id,
+          list: list
+        }
+      }))
+    }
     Promise.all(tasks).then(res => {
       wx.hideLoading();
       wx.showToast({
         title: '提交成功',
       })
+      if (this.data.share) {
+        wx.navigateTo({
+          url: '../tip/index?share=0',
+        });
+        return;
+      }
       wx.navigateTo({
         url: '../tip/index',
       })
+      
     }).catch(err => {
       console.log(err);
       wx.showToast({

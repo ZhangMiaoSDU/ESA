@@ -28,6 +28,7 @@ Page({
   onLoad: function (options) {
     console.log("pages/jqStat/index: ", options)
     let _this = this;
+    if (options.share) {this.setData({share: true})}
     this.setData({ jqid: options.id });
     jqDB.doc(this.data.jqid).get().then(res => {
       console.log(res);
@@ -300,6 +301,13 @@ Page({
   },
   closeDetail() {
     this.setData({ userIndex: null, show: false })
+  },
+  onUnload() {
+    if (this.data.share) {
+      wx.redirectTo({
+        url: '../index/index',
+      })
+    }
   }
 
 })

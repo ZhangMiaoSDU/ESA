@@ -22,6 +22,7 @@ Page({
       var groupInfo = res.data[0];
       var listid = groupInfo.listid;
       var creator = groupInfo.creator;
+      if (creator == app.globalData.openid) { this.setData({ hasPermisson: true})}
       var gAdmin = groupInfo.administrator || [];
       _this.loadMember(listid, creator, gAdmin).then(res => {
         console.log(res);

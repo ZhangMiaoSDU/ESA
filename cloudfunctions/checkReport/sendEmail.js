@@ -25,7 +25,7 @@ const sendEmail = async (userName, situation, userClass, email) => {
     // 发件人
     from: '柠檬 <zhangmiao19225@163.com>',
     // 主题
-    subject: '紧急异常情况',
+    subject: '异常情况',
     // 收件人
     to: email,
     // 邮件内容，text或者html格式

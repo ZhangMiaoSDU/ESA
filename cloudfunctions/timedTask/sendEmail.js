@@ -18,7 +18,7 @@ var config = {
 };
 // 创建一个SMTP客户端对象
 var transporter = nodemailer.createTransport(config);
-const sendEmail = async (id, name, email) => {
+const sendEmail = async (id, name, emails) => {
   console.log(`--------------------------------${name}---------------------------------------`)
   // 生成excel表格
   const fileUrl = await getExcel.getExcel(id);
@@ -32,20 +32,22 @@ const sendEmail = async (id, name, email) => {
   该链接的有效期为一天，请及时下载查看。谢谢。
   `;
   // return;
-  await transporter.sendMail({
-    // 发件人
-    from: '柠檬 <zhangmiao19225@163.com>',
-    // 主题
-    subject: '问卷数据下载链接',
-    // 收件人
-    to: email,
-    // 邮件内容，text或者html格式
-    text: text
-  }).then(res => {
-    console.log(res)
-  }).catch(err => {
-    console.error(err)
-  })
+  for (let i=0; i< emails.length; i++) {
+    await transporter.sendMail({
+      // 发件人
+      from: '柠檬 <zhangmiao19225@163.com>',
+      // 主题
+      subject: '问卷数据下载链接',
+      // 收件人
+      to: emails[i],
+      // 邮件内容，text或者html格式
+      text: text
+    }).then(res => {
+      console.log(res)
+    }).catch(err => {
+      console.error(err)
+    })
+  }
 }
 
 module.exports = {

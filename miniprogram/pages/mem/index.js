@@ -14,11 +14,12 @@ Page({
       _this.setData({ groupsInfo: res })
     })
   },
+
   loadGroup() {
     var _this = this;
     return new Promise((resolve, reject) => {
       wx.cloud.callFunction({
-        name: 'queryDB',
+        name: 'queryDB', 
         data: {
           queryGroup: true,
           userId: app.globalData.openid
@@ -31,6 +32,7 @@ Page({
         .catch(res => { reject(res) })
     })  
   },
+
 
   createGroup() {
     wx.navigateTo({
@@ -56,6 +58,14 @@ Page({
   deleteGroup(e) {
     var _this = this;
     var gid = e.currentTarget.dataset.gid;
+    var gcreator = e.currentTarget.dataset.creator;
+    if (app.globalData.openid != gcreator) {
+      wx.showToast({
+        title: '您没有删除权限！',
+        icon: 'none'
+      });
+      return;
+    }
     wx.showModal({
       title: '提示',
       content: '确定删除该组?',

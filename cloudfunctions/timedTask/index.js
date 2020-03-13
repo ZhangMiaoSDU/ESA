@@ -79,8 +79,12 @@ exports.main = async (event, context) => {
         }
       } else if (taskType == 3) {
         console.log("按周通知", tasks[i]._id);
-        // 处理提醒事件
+        // 处理提醒事件 在事件的中间提醒
         var isoSelectedDay = tasks[i].isoSelectedDay;
+        isoSelectedDay = isoSelectedDay.map(item => { 
+          if (item == 6) { return item + 1 - 7 } else { return item + 1 } 
+        })
+        console.log(isoSelectedDay)
         var isoTimeHour = tasks[i].isoTimeHour;
         // 小时对应，且提醒日对应
         if (currentHour == isoTimeHour && isoSelectedDay.indexOf(currentDay) != -1) {
@@ -121,6 +125,7 @@ exports.main = async (event, context) => {
       console.error(e)
     }
   }
+  
   for (let i = 0; i < assignedTask.length; i++) {
     let task = assignedTask[i];
     const sendEmail = require('sendEmail.js')
@@ -146,12 +151,24 @@ exports.main = async (event, context) => {
     let task = sendEmailTasks[i];
     const sendEmail = require('sendEmail.js')
     try {
-      // console.log(sendEmailTasks) 
-      let res = await sendEmail.sendEmail(task.jqid, task.name, task.mail);
-      console.log(res)
-      if (task.secEmail && task.secEmail.trim() != '') {
-        await sendEmail.sendEmail(task.jqid, task.name, task.secEmail)
+      var mails;
+      // console.log(sendEmailTasks) 1583552739980_0.9923255171463157_33588743-1583552741702_1_92004
+      if (task.jqid == "1583552739980_0.9923255171463157_33588743-1583552741702_1_92004") {
+        mails = [task.mail, "1815276437@qq.com", "616770435@qq.com", "42090396@qq.com"];
+        var res = await sendEmail.sendEmail(task.jqid, task.name, mails);
+        // let res1 = await sendEmail.sendEmail(task.jqid, task.name, "1815276437@qq.com");
+        // let res2 = await sendEmail.sendEmail(task.jqid, task.name, "616770435@qq.com");//sunlei
+        // let res3 = await sendEmail.sendEmail(task.jqid, task.name, "42090396@qq.com");//wang
+      } else {
+        if (task.secEmail && task.secEmail.trim() != '') {
+          mails = [task.mail, task.secEmail];
+          var res = await sendEmail.sendEmail(task.jqid, task.name, mails)
+        } else {
+          mails = [task.mail];
+          var res = await sendEmail.sendEmail(task.jqid, task.name, mails);
+        }
       }
+      
     } catch (e) {
       console.error(e)
     }
