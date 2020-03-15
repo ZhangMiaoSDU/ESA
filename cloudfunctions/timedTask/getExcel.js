@@ -18,20 +18,7 @@ function getFTime() {
 
 
 function formatData(questionsInfo, usersInfo, jqInfo) {
-  let gmtTime = getFTime();
-  console.log("gmtTime: ", gmtTime)
-  let count = jqInfo.count;
-  gmtTime = gmtTime.join('/');
-  console.log(gmtTime);
-  if (jqInfo.type == 1) {
-    console.log("按月：", jqInfo._id);
-    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
-  }
-  if (jqInfo.type == 3) {
-    console.log("按周：", jqInfo._id);
-    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
-    console.log("gmtTime : ", gmtTime)
-  }
+  let gmtTime = jqInfo.previousPeriod[0];
   // return;
   let questionDict = {};
   let header = [];
@@ -132,23 +119,7 @@ const getExcel = async id => {
   let jqInfo = jqRes.data;
   let jqUser;
   
-  let gmtTime = getFTime();
-  console.log("gmtTime: ", gmtTime)
-  let count = jqInfo.count;
-  gmtTime = gmtTime.join('/');
-  console.log(gmtTime);
-  jqUser = jqInfo[gmtTime] || jqInfo.jqUser || [];
-  if (jqInfo.type == 1) {
-    console.log("按月：", jqInfo._id);
-    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
-    jqUser = jqInfo[gmtTime] || []
-  }
-  if (jqInfo.type == 3) {
-    console.log("按周：", jqInfo._id);
-    gmtTime = jqInfo.priviousPeriod[0];//上一时期的问卷
-    console.log("gmtTime : ", gmtTime);
-    jqUser = jqInfo[gmtTime] || [];
-  }
+  let gmtTime = jqInfo.previousPeriod[0]; 
   let tasksUser = [];
   for (let i = 0; i < jqUser.length; i++) {
     tasksUser.push(db.collection("user").doc(jqUser[i]).get())

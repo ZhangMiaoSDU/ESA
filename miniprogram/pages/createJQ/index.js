@@ -93,6 +93,7 @@ Page({
     let jq = options.jq;
     this.setData({ title: jq, jqid: options.id});
     if (options.editing) { this.setData({ editing: true})}
+    if (options.create) { this.setData({ create: true }) }
     if (options.ques) {this.setData({ques: true})}
     wx.cloud.callFunction({ name: 'queryDB', data: { _DBName: 'question' } })
     .then(res => {
@@ -201,10 +202,23 @@ Page({
       });
       return;
     }
-    console.log("create back")
-    wx.navigateBack({
-      delta: 2
-    });
+    if (this.data.create) {
+      console.log("create back")
+      wx.navigateBack({
+        delta: 2
+      });
+      return;
+    }
+  },
+  onUnload(){
+    console.log("onUnload");
+    if (this.data.create) {
+      console.log("create back")
+      wx.navigateBack({
+        delta: 1
+      });
+      return;
+    }
   },
   bindQ(e) {
     let value = e.detail.value;
@@ -362,78 +376,10 @@ Page({
     console.log(answerInfo)
     this.setData({ answerInfo: answerInfo })
   }, 
-  submitJQByOneTime() {
-    var jqInfo = this.data.jqInfo;
-    var deadline = jqInfo.deadline;//一次性文问卷截止日期
-    var saveDate = deadline.split('-').join("/");
-    return saveDate;
-  },
 
-  submitJQByMonth() {
-    var jqInfo = this.data.jqInfo;
-    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
-    console.log("startTime: ", startTime);
-    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    let endTime;
-    var deadlineTime = timestampToTime(deadline)
-    endTime = deadlineTime;
-    console.log("endTime: ", endTime)
-    var day = jqInfo.date;
-    var dateList = utils.formatEveryMonthDay(startTime, endTime, day);
-    console.log(dateList, startTime, endTime, day)
-    let currentDay;
-    var now = new Date().getTime();//当前时间戳
-    for (let i = 0; i < dateList.length - 1; i++) {
-      var dateTimestamp = new Date(dateList[i]).getTime();
-      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
-      if (now >= dateTimestamp && now < nextdateTimestamp) {
-        currentDay = dateList[i];
-      }
-      if (now >= dateTimestamp && !nextdateTimestamp) {
-        currentDay = dateList[i];
-      }
-    }
-    return currentDay;
-  },
-
-  submitByWeek() {
-    var jqInfo = this.data.jqInfo;
-    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
-    console.log("startTime: ", startTime);
-    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    let endTime;
-    var deadlineTime = timestampToTime(deadline)
-    endTime = deadlineTime;
-    console.log("endTime: ", endTime)
-    var selectedDay = jqInfo.selectedDay;
-    var dateList = utils.formatEveryWeekDay(startTime, endTime, selectedDay);
-    console.log(dateList)
-    var currentDay;
-    var now = new Date().getTime();//当前时间戳
-    for (let i = 0; i < dateList.length; i++) {
-      var dateTimestamp = new Date(dateList[i]).getTime();
-      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
-      if (now >= dateTimestamp && now < nextdateTimestamp) {
-        currentDay = dateList[i]
-      }
-      if (now >= dateTimestamp && !nextdateTimestamp) {
-        currentDay = dateList[i];
-      }
-    }
-    return currentDay;
-  },
   submitJQ() {
-    var currentDay = timestampToTime(new Date().getTime()).split('-').join('/');
     var jqInfo = this.data.jqInfo;
-    if (jqInfo.type == 0) {
-      currentDay = this.submitJQByOneTime();
-    }
-    if (jqInfo.type == 1) {
-      currentDay = this.submitJQByMonth();
-    }
-    if (jqInfo.type == 3) {
-      currentDay = this.submitByWeek();
-    }
+    var currentDay = jqInfo.saveRecordDay;
     console.log(jqInfo.type, "================> currentDay: ", currentDay);
     // return;
     let userId = app.globalData.openid;
@@ -484,91 +430,18 @@ Page({
     wx.showLoading({
       title: '加载中',
     })
-    let tasks = [];
-    // 1 jq 保存提交问卷的用户id
-    tasks.push(wx.cloud.callFunction({
+    console.log(jqInfo._id,app.globalData.openid,currentDay,answerInfo)
+    wx.cloud.callFunction({
       name: 'updateDoc',
       data: {
-        addjqUser: true,
-        id: jqId,
-        userId: userId
+        submitJQ: true,
+        jqId: jqInfo._id,
+        userId:app.globalData.openid,
+        currentDay: currentDay,
+        answerInfo: answerInfo,
       }
-    }))
-    var usersId;
-    if (this.data.jqInfo[currentDay]) {
-      console.log("存在字段");
-      usersId = new Set(this.data.jqInfo[currentDay]);
-      usersId.add(app.globalData.openid);
-    } else {
-      usersId = new Set([app.globalData.openid]);
-    }
-    tasks.push(wx.cloud.callFunction({
-      name: 'updateDoc',
-      data: {
-        updateRecord: true,
-        id: jqId,
-        date: currentDay,
-        usersId: Array.from(usersId)
-      }
-    }))
-    // 2 jq 保存用户的问卷答案
-    tasks.push(wx.cloud.callFunction({
-      name: 'updateDoc',
-      data: {
-        updateJQSummary: true,
-        id: jqId,
-        summary: summary,
-      }
-    }))
-    // 3 user 更新最新答案
-    tasks.push(wx.cloud.callFunction({
-      name: 'updateDoc',
-      data: {
-        updateAnswers: true,
-        id: userId,
-        answers: answerInfo
-      }
-    }))
-    // 4 user 添加填写问卷的id
-    tasks.push(wx.cloud.callFunction({
-      name: 'updateDoc',
-      data: {
-        updateJQs: true,
-        id: userId,
-        jqid: jqId
-      }
-    }));
-    // 查看该用的id是否在应填名单中，如不在，将其加入；
-    var list = jqInfo.list;
-    var listid = list.map(item => {return item.id}).filter(item =>{return item});
-    var listphone = list.map(item => {return item.phone});
-    console.log("listphone==========>", listphone)
-    var uinfo = this.data.userInfo;
-    if (listid.indexOf(app.globalData.openid) == -1) {
-      var phone = uinfo.phone || '';
-      var index = phone == '' ? listphone.indexOf(phone) : -1;
-      if (index != -1) {
-        console.log("有该用户的手机号")
-        list[index].id = app.globalData.openid;
-      } else {
-        console.log("没有该用户，手机号")
-        var info = {
-          id: uinfo.openid,
-          phone: uinfo.phone,
-          name: uinfo.name
-        }
-        list.push(info)
-      }
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          updateList: true,
-          jqid: jqInfo._id,
-          list: list
-        }
-      }))
-    }
-    Promise.all(tasks).then(res => {
+    })
+    .then(res => {
       wx.hideLoading();
       wx.showToast({
         title: '提交成功',
@@ -719,3 +592,61 @@ Page({
     }
   }
 })
+
+  // submitJQByOneTime() {
+  //   return jqInfo.saveRecordDay;
+  // },
+
+  // submitJQByMonth() {
+  //   var jqInfo = this.data.jqInfo;
+  //   var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
+  //   console.log("startTime: ", startTime);
+  //   let deadline = jqInfo.deadline.split('-').join('/');//截止日期
+  //   let endTime;
+  //   var deadlineTime = timestampToTime(deadline)
+  //   endTime = deadlineTime;
+  //   console.log("endTime: ", endTime)
+  //   var day = jqInfo.date;
+  //   var dateList = utils.formatEveryMonthDay(startTime, endTime, day);
+  //   console.log(dateList, startTime, endTime, day)
+  //   let currentDay;
+  //   var now = new Date().getTime();//当前时间戳
+  //   for (let i = 0; i < dateList.length - 1; i++) {
+  //     var dateTimestamp = new Date(dateList[i]).getTime();
+  //     var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
+  //     if (now >= dateTimestamp && now < nextdateTimestamp) {
+  //       currentDay = dateList[i];
+  //     }
+  //     if (now >= dateTimestamp && !nextdateTimestamp) {
+  //       currentDay = dateList[i];
+  //     }
+  //   }
+  //   return currentDay;
+  // },
+
+  // submitByWeek() {
+  //   var jqInfo = this.data.jqInfo;
+  //   var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
+  //   console.log("startTime: ", startTime);
+  //   let deadline = jqInfo.deadline.split('-').join('/');//截止日期
+  //   let endTime;
+  //   var deadlineTime = timestampToTime(deadline)
+  //   endTime = deadlineTime;
+  //   console.log("endTime: ", endTime)
+  //   var selectedDay = jqInfo.selectedDay;
+  //   var dateList = utils.formatEveryWeekDay(startTime, endTime, selectedDay);
+  //   console.log(dateList)
+  //   var currentDay;
+  //   var now = new Date().getTime();//当前时间戳
+  //   for (let i = 0; i < dateList.length; i++) {
+  //     var dateTimestamp = new Date(dateList[i]).getTime();
+  //     var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
+  //     if (now >= dateTimestamp && now < nextdateTimestamp) {
+  //       currentDay = dateList[i]
+  //     }
+  //     if (now >= dateTimestamp && !nextdateTimestamp) {
+  //       currentDay = dateList[i];
+  //     }
+  //   }
+  //   return currentDay;
+  // },

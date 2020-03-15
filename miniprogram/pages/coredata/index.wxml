@@ -19,7 +19,7 @@
                   <view>{{item.name}}</view>
                   <view style="font-size: 24rpx; margin-left: 40rpx">ID:{{item.creationTime}}</view>
                 </view>
-                <view wx:if='{{item.period}}' style="font-size: 20rpx;">{{item.period[0]}}<text wx:if='{{item.period[1]}}'> - {{item.period[1]}}</text></view>
+                <view wx:if='{{item.period}}' style="font-size: 20rpx;">{{item.period[0]}} - {{item.period[1]}}</view>
                 <view style="font-size: 24rpx;">
                   <view wx:if="{{item.required || item.required == 0}}">
                     <text class="label label-warning">应填人数({{item.required}})</text>

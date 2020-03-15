@@ -34,62 +34,8 @@ Page({
       console.log(res);
       let jqInfo = res.data;
       _this.setData({ jqInfo: jqInfo});
-      let start = timestampToTime(jqInfo.creationTime);
-      let now = timestampToTime(new Date().getTime());
-      let deadline = jqInfo.deadline.split('-').join('/');
-      let end;
-      if (new Date().getTime() < new Date(deadline).getTime()) {
-        console.log('还未到截止日期');
-        end = now
-      } else {
-        end = jqInfo.deadline
-      }
-      let dateList = utils.formatEveryDay(start, end);
-
-      if (jqInfo.type == 0) {
-        console.log("一次性");
-        dateList = [deadline];
-        dateList = [`${start.split('-').join('/')}-${deadline}`]
-      }
-      if (jqInfo.type == 1) {
-        console.log("按月");
-        var date = jqInfo.date;
-        dateList = utils.formatEveryMonthDay(start, jqInfo.deadline, date);
-        if (dateList.length > 1) {
-          dateList = dateList.map((item, index) => { 
-            if (index < dateList.length - 1) { 
-              return dateList[index] + '-' + dateList[index + 1] 
-            } else { return item + '-' + deadline } 
-          }); 
-        }
-        if (dateList.length == 1) {
-          dateList = [`${dateList[0]}-${deadline}`]
-        }
-        if (dateList.length == 0) {
-          dateList = [`${start.split('-').join('/')}-${deadline}`]
-        }
-
-      }
-      if (jqInfo.type == 3) {
-        console.log("按周");
-        var selectedDay = jqInfo.selectedDay;
-        dateList = utils.formatEveryWeekDay(start, jqInfo.deadline, selectedDay);
-        if (dateList.length > 1) {
-          dateList = dateList.map((item, index) => { 
-            if (index < dateList.length - 1) { 
-              return dateList[index] + '-' + dateList[index + 1] 
-            } else { return item + '-' + deadline} 
-          });
-        }
-        if (dateList.length == 1) {
-          dateList = [`${dateList[0]}-${deadline}`]
-        }
-        if (dateList.length == 0) {
-          dateList = [`${start.split('-').join('/')}-${deadline}`]
-        }
-      }
-      _this.setData({ dateList: dateList})
-      console.log(start, end, '\n', dateList);
+      _this.setData({ periods: jqInfo.periods})
+      console.log('jqInfo \n', this.data.periods);
       let allAnswer = _this.formatSummary(jqInfo)
       _this.setData({ summary: allAnswer });
     })
@@ -110,7 +56,6 @@ Page({
       selectShow: !this.data.selectShow
     });
     let allAnswer = _this.formatSummary(this.data.jqInfo)
-
     _this.setData({ summary: allAnswer });
 
   },
@@ -149,15 +94,12 @@ Page({
     questionsInfo.map(item => {
       questionDict[item._id] = { content: item.content, type: item.type, options: item.options ? item.options : [], answers: [] }
     });
-    var dateList = this.data.dateList;
+    var periods = this.data.periods;
     var dateindex = this.data.index
-    let selectTime = dateList[dateindex];
-    console.log("selectTime: ", selectTime)
-    if (jqInfo.type == 1 || jqInfo.type == 3) {
-      selectTime = selectTime.split('-')[0]
-    }
+    let selectTime = periods[dateindex][0];
+    console.log("selectTime: ", selectTime);
     if(jqInfo.type == 0) {
-      selectTime = selectTime.split('-')[1]
+      selectTime = selectTime[1]
     }
     // let selectTimeISO = new Date(selectTime).toISOString().split('T')[0].split('-').join('/'); //格式："2020/02/16"
     console.log("selectTime: ", selectTime)

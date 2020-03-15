@@ -119,26 +119,71 @@ exports.main = async (event, context) => {
       } 
     })
   }  else if (event.addUniv) {
-    return await univcollDB.doc('UNIV').update({
+    console.log("-----------------添加大学-----------------", event.univ)
+    var res = await univcollDB.get();
+    var UNIV = res.data.filter(item => { return item._id == "UNIV" })[0];
+    var univName = UNIV.name;
+    var univId = UNIV.id;
+    var univLen = UNIV.name.length + 1;
+    var univ = event.univ;
+    var univid;
+    if (univName.indexOf(univ) == -1) {
+      univid = univLen < 10 ? '00' + univLen : univLen < 100 ? '0' + univLen : String(univLen);
+    } else {
+      univid = univId[univName.indexOf(univ)]
+    }
+    await univcollDB.doc('UNIV').update({
       data: {
-        name: _.addToSet(event.univ),
-        id: _.addToSet(event.univid)
+        name: _.addToSet(univ),
+        id: _.addToSet(univid)
       }
     })
+    return univid;
   } else if (event.addColl) {
-    return await univcollDB.doc('COLL').update({
+    console.log("-----------------添加学院-----------------", event.coll)
+    var res = await univcollDB.get();
+    var COLL = res.data.filter(item => { return item._id == "COLL" })[0];
+    var collName = COLL.name;
+    var collId = COLL.id;
+    var collLen = COLL.name.length + 1;
+    var coll = event.coll;
+    var collid;
+    console.log(collName.indexOf(coll), collName)
+    if (collName.indexOf(coll) == -1) {
+      collid = collLen < 10 ? '00' + collLen : collLen < 100 ? '0' + collLen : String(collLen);
+    } else {
+      collid = collId[collName.indexOf(coll)]
+      
+    }
+    await univcollDB.doc('COLL').update({
       data: {
         name: _.addToSet(event.coll),
-        id: _.addToSet(event.collid)
+        id: _.addToSet(collid)
       }
     })
+    return collid;
   } else if (event.addClass) {
-    return await univcollDB.doc('_CLASS').update({
+    console.log("-----------------添加班级-----------------", event._class)
+    var res = await univcollDB.get();
+    var _CLASS = res.data.filter(item => { return item._id == "_CLASS" })[0];
+    var _className = _CLASS.name;
+    var _classId = _CLASS.id;
+    var _classLen = _CLASS.name.length + 1;
+    var _class = event._class;
+    var _classid;
+    if (_className.indexOf(_class) == -1) {
+      _classid = _classLen < 10 ? '00' + _classLen : _classLen < 100 ? '0' + _classLen : String(_classLen);
+    } else {
+      _classid = _classId[_className.indexOf(_class)]
+    }
+    console.log("_classid：", _classid)
+    await univcollDB.doc('_CLASS').update({
       data: {
-        name: _.addToSet(event._class),
-        id: _.addToSet(event._classid)
+        name: _.addToSet(_class),
+        id: _.addToSet(_classid)
       }
     })
+    return _classid;
   } else if (event.removejq) {
     return await jqDB.doc(event.jqid).remove();
   } else if (event.updateList) {
@@ -216,5 +261,58 @@ exports.main = async (event, context) => {
     return await db.collection('group').where({ id: gid }).update({
       data: { administrator: _.pullAll([uid]) }
     })
+  } else if (event.submitJQ) {
+    console.log("---------------------------保存答卷---------------------------")
+    var jqId = event.jqId; // 保存该问卷的答卷
+    var userId = event.userId; //提交该用户的答卷
+    var currentDay = event.currentDay; //保存日期
+    var answerInfo = event.answerInfo; //用户的答卷
+    var jqRes = await jqDB.doc(jqId).get();
+    var jqInfo = jqRes.data;
+    var userRes = await userDB.doc(userId).get();
+    var userInfo = userRes.data;
+    // 1. 保存该用户的id到jqUser，保存该问卷本阶段提交的人数
+    var currentRecord;
+    if (jqInfo[currentDay].indexOf(userId) == -1) {
+      currentRecord = jqInfo.currentRecord + 1;
+    } else {
+      currentRecord = jqInfo.currentRecord;
+    }
+    var task1 = await jqDB.doc(jqId).update({
+      data: { jqUser: _.addToSet(userId), currentRecord: currentRecord}
+    });
+    // 更新用户的答案
+    var task2 = await userDB.doc(userId).update({ data: answerInfo })
+
+    // 2. 记录本阶段提交的用户的id， 保存答卷
+    var usersId = jqInfo[currentDay] || [];
+    usersId = Array.from(new Set(usersId.concat(userId)));
+    var obj = {};
+    obj[currentDay] = usersId;
+    for (let key in answerInfo) {
+      if (answerInfo[key] == 0) { answerInfo[key] = '0' }
+    }
+    obj[userId] = {};
+    obj[userId][currentDay] = answerInfo;
+
+    // 
+    var list = jqInfo.list;
+    var listid = list.map(item => { return item.id }).filter(item => { return item });
+    var listphone = list.map(item => { return item.phone });
+    // 名单没有该用户
+    if (listid.indexOf(userId) == -1) {
+      var phone = userInfo.phone || '';
+      var index = phone == '' ? listphone.indexOf(phone) : -1;
+      if (index != -1) {console.log("有该用户的手机号");list[index].id = userId;
+      } else {console.log("没有该用户，手机号")
+        var info = {id: uinfo.openid,phone: uinfo.phone,name: uinfo.name}
+        list.push(info)
+      }
+      obj['list'] = list;
+    }
+    console.log("task2: 记录本阶段提交的用户的id， 保存答卷，更新list。obj:", obj);
+    var task3 = await jqDB.doc(jqId).update({ data: obj });
+    console.log(task1, task2, task3)
+    return task3;
   }
 }

@@ -1,46 +1,73 @@
 <!--pages/config/index.wxml-->
 <view>
   <view class="list">
-    <view class="item" bindtap="displayMask" data-index="0">一次性</view>
-    <view class="item" bindtap="displayMask" data-index="1">按月通知</view>
-    <view class="item" bindtap="displayMask" data-index="2">每日通知</view>
-    <view class="item" bindtap="displayMask" data-index="3">每周通知</view>
+    <view class="item" bindtap="displayMask" data-index="0">
+      <view>一次性</view>
+      <view class="description">
+        <text>需设置截止日期，提醒用户填写日期及时间，接收邮件时间。</text>
+        <text>此类型问卷将在截止日期将答卷信息发送到您填写的邮箱。</text>
+      </view>
+    </view>
+
+    <view class="item" bindtap="displayMask" data-index="1">
+      <view>每月</view> 
+      <view class="description">
+        <text>需设置截止日期，问卷阶段截止日期（如每月13日，则本月13日至下月13日为一阶段，依次类推），提醒用户填写日期及时间，接收邮件时间。</text>
+        <text>此类型问卷将每月重复一次，依据设定的问卷阶段截止日期。本周期的答卷信息将会在下一周期的第一天发送到您填写的邮箱。</text>
+      </view>
+    </view>
+
+    <view class="item" bindtap="displayMask" data-index="2">
+      <view>每日</view>
+      <view class="description">
+        <text>需设置截止日期，提醒用户填写时间，接收邮件时间。</text>
+        <text>此类型问卷的答卷信息将会在当日发送到您填写的邮箱。</text>
+      </view>
+    </view>
+
+    <view class="item" bindtap="displayMask" data-index="3">
+      <view>每周</view>
+      <view class="description">
+        <text>需设置截止日期，问卷阶段截止日（如每周一、周四，则周二至周四为一阶段，周五至下周一，依次类推），提醒用户填写时间，接收邮件时间。</text>
+        <text>此类型问卷依据设定的问卷阶段截止日进行划分。本周期的答卷信息将会在下一周期的第一天发送到您填写的邮箱。</text>
+      </view>
+    </view>
+
   </view>
 </view>
 
 
-<view class="mask" bindtap="cancelEmailMask" wx:if="{{showEmailMask}}">
+<view class="mask" bindtap="cancelMask" wx:if="{{showMask && type==0}}">
   <view class="mask-content" catchtap="s">
     <view>
-      <view style="text-align: center;font-size: 20px;">选择提醒时间</view>
-      <picker mode="time" value="{{time}}" start="08:00" end="23:00" bindchange="bindTimeChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
+      <view class="content-header">一次性问卷设置</view>
+      <picker mode="multiSelector" value="{{dateTime1}}" bindchange="changeDateTime1" bindcolumnchange="changeDateTimeColumn1" range="{{dateTimeArray1}}">
+        <view class="picker-view">
           <view class="picker">
-            提醒时间: {{time}}
+           提醒用户填写时间: {{time}}
           </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
-        </view>
-      </picker>
-      
-      <picker mode="time" value="{{retime}}" start="08:00" end="23:00" bindchange="bindReTimeChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
-          <view class="picker">
-            接收邮件时间: {{retime}}
-          </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
-        </view>
-      </picker>
-      
-      <picker mode="date" value="{{deadline}}" start="2019-09-01" end="2027-09-01" bindchange="bindDChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
-          <view class="picker">
-            问卷的截止时间: {{deadline}}
-          </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
+          <image src="{{images.arrow}}"></image>
         </view>
       </picker>
 
-      <view class="btn-view" style="background: #fff">
+      <picker mode="date" value="{{deadline}}" start="2019-09-01" end="2027-09-01" bindchange="bindDChange">
+        <view class="picker-view">
+          <view class="picker">
+            问卷的截止时间: {{deadline}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+      <picker mode="time" value="{{retime}}" start="08:00" end="23:00" bindchange="bindReTimeChange">
+        <view class="picker-view">
+          <view class="picker">
+            接收邮件时间: {{retime}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+      
+      <view class="btn-view">
         <view class="btn" bindtap="confirm">确定</view>
       </view>
     </view>
@@ -48,18 +75,37 @@
 </view>
 
 
-<view class="mask" bindtap="cancelMask" wx:if="{{showMask}}">
+<view class="mask" bindtap="cancelMask" wx:if="{{showMask && type==1}}">
   <view class="mask-content" catchtap="s">
     <view>
-      <view style="text-align: center;font-size: 20px;">选择提醒时间</view>
-      <picker wx:if="{{type === 1}}" value="{{index}}" range="{{array}}" bindchange="bindDateChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
+      <view class="content-header">每月重复的问卷设置</view>
+      <picker value="{{index}}" range="{{array}}" bindchange="bindDateChange" data-label="remind">
+        <view class="picker-view">
           <view class="picker">
-            提醒日: {{array[index]}}
+            提醒用户填写日期: 每月{{reminddate}}号
           </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
+          <image src="{{images.arrow}}"></image>
         </view>
       </picker>
+
+      <picker mode="time" value="{{time}}" start="09:00" end="22:00" bindchange="bindTimeChange">
+        <view class="picker-view">
+          <view class="picker">
+            提醒用户填写时间: {{time}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
+      <picker value="{{index}}" range="{{array}}" bindchange="bindDateChange"  data-label="period">
+        <view class="picker-view">
+          <view class="picker">
+            问卷重复日: 每月{{perioddate}}号
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
       <view wx:if="{{type === 3}}">
         <view>提醒日（可多选）:</view>
         <checkbox-group bindchange="checkWeekChange" style="margin-left: 20rpx;">
@@ -68,30 +114,22 @@
           </label>
         </checkbox-group>
       </view>
-      <picker mode="time" value="{{time}}" start="08:00" end="23:00" bindchange="bindTimeChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
-          <view class="picker">
-            提醒时间: {{time}}
-          </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
-        </view>
-      </picker>
-
+      
       <picker mode="time" value="{{retime}}" start="08:00" end="23:00" bindchange="bindReTimeChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
+        <view class="picker-view">
           <view class="picker">
             接收邮件时间: {{retime}}
           </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
+          <image src="{{images.arrow}}"></image>
         </view>
       </picker>
 
       <picker mode="date" value="{{deadline}}" start="2019-09-01" end="2027-09-01" bindchange="bindDChange">
-        <view style="display: flex;justify-content: space-between;height: 30px;padding: 10px;">
+        <view class="picker-view">
           <view class="picker">
-            问卷的截止时间: {{deadline}}
+            问卷截止时间: {{deadline}}
           </view>
-          <image src="{{images.arrow}}" style="width: 20px; height: 20px"></image>
+          <image src="{{images.arrow}}"></image>
         </view>
       </picker>
       <view class="btn-view" style="background: #fff">
@@ -100,3 +138,99 @@
     </view>
   </view>
 </view>
+
+
+<view class="mask" bindtap="cancelMask" wx:if="{{showMask && type==2}}">
+  <view class="mask-content" catchtap="s">
+    <view>
+      <view class="content-header">每日重复的问卷设置</view>
+      <picker mode="time" value="{{time}}" start="09:00" end="22:00" bindchange="bindTimeChange">
+        <view class="picker-view">
+          <view class="picker">
+            提醒用户填写时间: {{time}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
+      <picker mode="time" value="{{retime}}" start="09:00" end="23:00" bindchange="bindReTimeChange">
+        <view class="picker-view">
+          <view class="picker">
+            接收邮件时间: {{retime}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
+      <picker mode="date" value="{{deadline}}" start="2019-09-01" end="2027-09-01" bindchange="bindDChange">
+        <view class="picker-view">
+          <view class="picker">
+            问卷截止时间: {{deadline}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+      <view class="btn-view" style="background: #fff">
+        <view class="btn" bindtap="confirm">确定</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+
+<view class="mask" bindtap="cancelMask" wx:if="{{showMask && type==3}}">
+  <view class="mask-content" catchtap="s">
+    <view style="font-size: 26rpx">
+      <view class="content-header">每周重复的问卷设置</view>
+
+      <view>提醒用户填写日（可多选）:</view>
+      <checkbox-group bindchange="checkWeekChange" data-label="remind">
+        <label wx:for="{{weekday}}" wx:key="index">
+          <checkbox value="{{index}}"/>{{item}}
+        </label>
+      </checkbox-group>
+
+
+      <picker mode="time" value="{{time}}" start="09:00" end="22:00" bindchange="bindTimeChange">
+        <view class="picker-view">
+          <view class="picker">
+            提醒用户填写时间: {{time}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
+      <view>阶段截止日（可多选）:</view>
+      <checkbox-group bindchange="checkWeekChange" data-label="period">
+        <label wx:for="{{weekday}}" wx:key="index">
+          <checkbox value="{{index}}"/>{{item}}
+        </label>
+      </checkbox-group>
+
+      <picker mode="time" value="{{retime}}" start="08:00" end="23:00" bindchange="bindReTimeChange">
+        <view class="picker-view">
+          <view class="picker">
+            接收邮件时间: {{retime}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
+      <picker mode="date" value="{{deadline}}" start="2019-09-01" end="2027-09-01" bindchange="bindDChange">
+        <view class="picker-view">
+          <view class="picker">
+            问卷截止时间: {{deadline}}
+          </view>
+          <image src="{{images.arrow}}"></image>
+        </view>
+      </picker>
+
+      <view class="btn-view" style="background: #fff">
+        <view class="btn" bindtap="confirm">确定</view>
+      </view>
+
+    </view>
+  </view>
+</view>
+
+

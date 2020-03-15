@@ -99,120 +99,26 @@ Page({
     }).catch(res => { console.log(res) })
   },
 
-  checkByOneTime(jqInfo) {
-    var deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    var startTime = timestampToTime(jqInfo.creationTime);//开始时间 / 
-    var now = new Date().getTime();//当前时间戳
-    var endTimestamp = new Date(deadline).getTime();
-    var startTimestamp = new Date(startTime).getTime();
-    var period = [startTime, deadline];
-    if (now >= startTimestamp && now < endTimestamp) {
-      // 查看有没有填写
-      var filled = jqInfo[deadline] || [];
-      if (filled.indexOf(app.globalData.openid) != -1) {
-        return [true, true, period];//该问卷已经填写
-      } else {
-        return [true, false, period];
-      }
-    } else {
-      return [false, false, false];
-    }
+  getDayandPeriod(jqInfo) {
+    return [jqInfo.saveRecordDay, jqInfo.currentPeriod]
   },
-  checkByMonth(jqInfo) {
-    var startTime = timestampToTimeByM(jqInfo.creationTime);//开始时间，gmt
-    console.log("startTime: ", startTime);
-    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    let endTime;
-    var deadlineTime = timestampToTimeByM(deadline)
-    endTime = deadlineTime;
-    console.log("endTime: ", endTime)
-    var day = jqInfo.date;
-    var dateList = formatEveryMonthDay(startTime, endTime, day);
-    console.log(dateList, startTime, endTime, day)
-    let isAdd, currentDay, period;
-    var now = new Date().getTime();//当前时间戳
-    for (let i = 0; i < dateList.length - 1; i++) {
-      var dateTimestamp = new Date(dateList[i]).getTime();
-      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
-      if (now >= dateTimestamp && now < nextdateTimestamp) {
-        isAdd = true;
-        currentDay = dateList[i];
-        period = [dateList[i], dateList[i + 1]];
-      }
-    }
-    if (dateList.length == 1) {
-      currentDay = dateList[0];
-      period = [dateList[0], endTime.split('-').join('/')];
-      if (now < new Date(endTime.split('-').join('/')).getTime()) {
-        isAdd = true;
-      }
-    }
-    if (dateList.length == 0) {
-      currentDay = startTime.split('-').join('/');
-      period = [startTime, endTime.split('-').join('/')];
-      if (now < new Date(endTime.split('-').join('/')).getTime()) {
-        isAdd = true;
-      }
-    }
-    if (isAdd) {
-      // 查看有没有填写
-      var filled = jqInfo[currentDay] || [];
-      if (filled.indexOf(app.globalData.openid) != -1) {
-        return [true, true, period];//该问卷已经填写
-      } else {
-        return [true, false, period];
-      }
-    } else {return [false, false, false]}
-  },
-  checkByWeek(jqInfo) {
-    var startTime = timestampToTimeByM(jqInfo.creationTime);//开始时间，gmt
-    console.log("startTime: ", startTime);
-    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    let endTime;
-    var deadlineTime = timestampToTimeByM(deadline);
-    endTime = deadlineTime;
-    console.log("endTime: ", endTime)
-    var selectedDay = jqInfo.selectedDay;
-    var dateList = formatEveryWeekDay(startTime, endTime, selectedDay);
-    console.log("dateList, ", dateList, selectedDay, startTime, endTime)
-    var isAdd, currentDay, period;
-    var now = new Date().getTime();//当前时间戳
-    for (let i = 0; i < dateList.length; i++) {
-      var dateTimestamp = new Date(dateList[i]).getTime();
-      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
-      if (now > dateTimestamp && now < nextdateTimestamp) {
-        isAdd = true;
-        currentDay = dateList[i];
-        period = [dateList[i], dateList[i + 1]];
-      }
-    }
-    console.log("dateList, ", isAdd, currentDay, period)
-    if (dateList.length == 1) {
-      currentDay = dateList[0];
-      period = [dateList[0], endTime.split('-').join('/')];
-      if (now < new Date(endTime.split('-').join('/')).getTime()) {
-        isAdd = true;
-      }
-    }
-    console.log("dateList, ", isAdd, currentDay, period)
 
-    if (dateList.length == 0) {
-      currentDay = startTime.split('-').join('/');
-      period = [currentDay, endTime.split('-').join('/')];
-      if (now < new Date(endTime.split('-').join('/')).getTime()) {
-        isAdd = true;
-      }
-    }
-    console.log("dateList, ", isAdd, currentDay, period)
-
-    if (isAdd) {
+  checkAdd(jqInfo) {
+    console.log("checkAdd")
+    var res = this.getDayandPeriod(jqInfo);
+    var currentDay = res[0], currentPeriod = res[1];
+    var now = new Date().getTime();
+    var previous = new Date(currentPeriod[0]).getTime();
+    var next = new Date(currentPeriod[1]).getTime();
+    // console.log(previous, now, next)
+    if (now >= previous && now <= next) {
       // 查看有没有填写
       console.log(currentDay)
       var filled = jqInfo[currentDay] || [];
       if (filled.indexOf(app.globalData.openid) != -1) {
-        return [true, true, period];//该问卷已经填写
+        return [true, true, currentPeriod];//该问卷已经填写
       } else {
-        return [true, false, period];
+        return [true, false, currentPeriod];
       }
     } else { return [false, false, false] }
   },
@@ -221,48 +127,50 @@ Page({
     let displayJqs = [];
     // 判断这些问卷是否需要今天填写
     for (let i = 0; i < jqsInfo.length; i++) {
-      if (jqsInfo[i].type == 0) {
-        console.log("一次性问卷");
-        var oneTimeRes = this.checkByOneTime(jqsInfo[i])
-        var isAdd = oneTimeRes[0];
-        var isFilled = oneTimeRes[1];
-        if (isAdd) { 
-          jqsInfo[i].period = oneTimeRes[2];
-          if (isFilled) { jqsInfo[i].isFill = true;}
-          displayJqs.push(jqsInfo[i]);
-        }
-      } else if (jqsInfo[i].type == 1) {
-        console.log("按月");
-        var monthRes = this.checkByMonth(jqsInfo[i])
-        var isAdd = monthRes[0];
-        var isFilled = monthRes[1];
-        if (isAdd) {
-          jqsInfo[i].period = monthRes[2];
-          if (isFilled) { jqsInfo[i].isFill = true;  }
-          displayJqs.push(jqsInfo[i]);
-        }
-      } else if (jqsInfo[i].type == 2) {
-        console.log("按日", this.data.currentDay)
-        var deaeline = jqsInfo[i].deadline.split('-').join('/');
-        if (timestampToTime(new Date().getTime()) < deaeline) {
-          console.log(jqsInfo[i][this.data.currentDay])
-          var currentDayRecord = jqsInfo[i][this.data.currentDay] || []
-          if (currentDayRecord.indexOf(app.globalData.openid) != -1) {
-            jqsInfo[i].isFill = true;
-          }
-          displayJqs.push(jqsInfo[i]);
-        }
-      } else if (jqsInfo[i].type == 3) {
-        console.log("按周");
-        var weekRes = this.checkByWeek(jqsInfo[i])
-        var isAdd = weekRes[0];
-        var isFilled = weekRes[1];
-        if (isAdd) {
-          jqsInfo[i].period = weekRes[2];
-          if (isFilled) { jqsInfo[i].isFill = true; }
-          displayJqs.push(jqsInfo[i]);
-        }
+      var weekRes = this.checkAdd(jqsInfo[i])
+      var isAdd = weekRes[0];
+      var isFilled = weekRes[1];
+      if (isAdd) {
+        jqsInfo[i].period = weekRes[2];
+        if (isFilled) { jqsInfo[i].isFill = true; }
+        displayJqs.push(jqsInfo[i]);
       }
+
+      // if (jqsInfo[i].type == 0) {
+      //   console.log("一次性问卷");
+      //   var oneTimeRes = this.checkAdd(jqsInfo[i])
+      //   var isAdd = oneTimeRes[0];
+      //   var isFilled = oneTimeRes[1];
+      //   if (isAdd) { 
+      //     jqsInfo[i].period = oneTimeRes[2];
+      //     if (isFilled) { jqsInfo[i].isFill = true;}
+      //     displayJqs.push(jqsInfo[i]);
+      //   }
+      // } else if (jqsInfo[i].type == 1) {
+      //   console.log("按月");
+      //   var monthRes = this.checkAdd(jqsInfo[i])
+      //   var isAdd = monthRes[0];
+      //   var isFilled = monthRes[1];
+      //   if (isAdd) {
+      //     jqsInfo[i].period = monthRes[2];
+      //     if (isFilled) { jqsInfo[i].isFill = true;  }
+      //     displayJqs.push(jqsInfo[i]);
+      //   }
+      // } else if (jqsInfo[i].type == 2) {
+      //   console.log("按日", this.data.currentDay)
+      //   var deaeline = jqsInfo[i].deadline.split('-').join('/');
+      //   if (timestampToTime(new Date().getTime()) < deaeline) {
+      //     console.log(jqsInfo[i][this.data.currentDay])
+      //     var currentDayRecord = jqsInfo[i][this.data.currentDay] || []
+      //     if (currentDayRecord.indexOf(app.globalData.openid) != -1) {
+      //       jqsInfo[i].isFill = true;
+      //     }
+      //     displayJqs.push(jqsInfo[i]);
+      //   }
+      // } else if (jqsInfo[i].type == 3) {
+      //   console.log("按周");
+        
+      // }
     }
     return displayJqs;
   },

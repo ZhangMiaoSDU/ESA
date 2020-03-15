@@ -8,91 +8,8 @@ const db = cloud.database();
 //操作excel用的类库
 const xlsx = require('node-xlsx');
 const intervalTime = 8 * 60 * 60 * 1000; //8个小时
-function getFTime() {
-  var timeStamp = new Date().getTime();
-  var gmtTimeStamp = timeStamp + intervalTime; //gmt比iso多八个小时
-  var month = (new Date(gmtTimeStamp).getMonth() + 1) < 10 ? '0' + (new Date(gmtTimeStamp).getMonth() + 1) : (new Date(gmtTimeStamp).getMonth() + 1);
-  var date = new Date(gmtTimeStamp).getDate() < 10 ? '0' + new Date(gmtTimeStamp).getDate() : new Date(gmtTimeStamp).getDate()
-  return [new Date().getFullYear(), month, date].join('/')
-}
-function getDate(datestr) {
-  var temp = datestr.split("-");
-  var date = new Date(temp[0], temp[1] - 1, temp[2]);
-  return date;
-}
-function getFTime() {
-  var timeStamp = new Date().getTime();
-  var gmtTimeStamp = timeStamp + intervalTime; //gmt比iso多八个小时
-  var month = (new Date(gmtTimeStamp).getMonth() + 1) < 10 ? '0' + (new Date(gmtTimeStamp).getMonth() + 1) : (new Date(gmtTimeStamp).getMonth() + 1);
-  var date = new Date(gmtTimeStamp).getDate() < 10 ? '0' + new Date(gmtTimeStamp).getDate() : new Date(gmtTimeStamp).getDate()
-  return [new Date().getFullYear(), month, date].join('/')
-}
-function formatEveryDay(start, end) {
-  let dateList = [];
-  var startTime = getDate(start);
-  var endTime = getDate(end);
-
-  while ((endTime.getTime() - startTime.getTime()) >= 0) {
-    var year = startTime.getFullYear();
-    var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
-    var day = startTime.getDate().toString().length == 1 ? "0" + startTime.getDate() : startTime.getDate();
-    dateList.push(year + "/" + month + "/" + day);
-    startTime.setDate(startTime.getDate() + 1);
-  }
-  return dateList;
-}
 
 
-function formatEveryMonthDay(start, end, day) {
-  let dateList = [];
-  var startTime = getDate(start);
-  var endTime = getDate(end);
-  var dayCount = 0;
-  while ((endTime.getTime() - startTime.getTime()) >= 0) {
-    var year = startTime.getFullYear();
-    var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
-    dayCount = new Date(year, month, 0).getDate();//本月的天数
-    var date = startTime.getDate() < 10 ? "0" + startTime.getDate() : startTime.getDate();
-    console.log("day:", day, date, Number(date))
-    if (day == Number(date)) {
-      var dayf = day < 10 ? '0' + day : day;
-      dateList.push(year + "/" + month + "/" + dayf);
-    }
-    // 如果设定日大于本月的天数，只添加一次
-    if (Number(date) == dayCount) {
-      if (day > dayCount) {
-        dateList.push(year + "/" + month + "/" + dayCount);
-      }
-    }
-    startTime.setDate(startTime.getDate() + 1);
-  }
-  return dateList;
-}
-
-function formatEveryWeekDay(start, end, weekday) {
-  let dateList = [];
-  var startTime = getDate(start);
-  var endTime = getDate(end);
-  while ((endTime.getTime() - startTime.getTime()) >= 0) {
-    var year = startTime.getFullYear();
-    var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
-    var date = startTime.getDate().toString().length == 1 ? "0" + startTime.getDate() : startTime.getDate();
-    // 查看周几
-    var time = year + "/" + month + "/" + date;
-    var day = new Date(time).getDay();
-    if (weekday.indexOf(day) != -1) {
-      dateList.push(time);
-    }
-    startTime.setDate(startTime.getDate() + 1);
-  }
-  return dateList;
-}
-
-
-function timestampToTime(timestamp) {
-  const date = new Date(timestamp)
-  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}-${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}`
-}
 function formatData(questionsInfo, usersInfo, currentjqInfo, dateList) {
   let questionDict = {};
   let header = [];
@@ -106,11 +23,11 @@ function formatData(questionsInfo, usersInfo, currentjqInfo, dateList) {
     header.push(item.content)
   });
   // console.log("questionDict: ", questionDict);
-  let pTemOptions = questionDict['032032b3-62d9-48d4-8589-e28ac7b29465'].options;//上午温度是否超过37.3
-  let aTemOptions = questionDict['72529d59-22a5-4fcc-8ea6-556ee62f7283'].options;//下午温度是否超过37.3
-  let clocationOptions = questionDict['8727263e-fb7e-450e-ab95-44a68f3d1bd4'].options;//目前所在地
-  let isOutOptions = questionDict['4908cf0f-5596-497c-94a1-0fd7cde3a44f'].options;//是否外出
-  let healthOptions = questionDict['a0a9b783-1201-4410-b358-88807a57c943'].options;//今日健康状况
+  let pTemOptions = questionDict['032032b3-62d9-48d4-8589-e28ac7b29465'] ? questionDict['032032b3-62d9-48d4-8589-e28ac7b29465'].options : [];//上午温度是否超过37.3
+  let aTemOptions = questionDict['72529d59-22a5-4fcc-8ea6-556ee62f7283'] ? questionDict['72529d59-22a5-4fcc-8ea6-556ee62f7283'].options : [];//下午温度是否超过37.3
+  let clocationOptions = questionDict['8727263e-fb7e-450e-ab95-44a68f3d1bd4'] ? questionDict['8727263e-fb7e-450e-ab95-44a68f3d1bd4'].options : [];//目前所在地
+  let isOutOptions = questionDict['4908cf0f-5596-497c-94a1-0fd7cde3a44f']? questionDict['4908cf0f-5596-497c-94a1-0fd7cde3a44f'].options : [];//是否外出
+  let healthOptions = questionDict['a0a9b783-1201-4410-b358-88807a57c943'] ? questionDict['a0a9b783-1201-4410-b358-88807a57c943'].options : [];//今日健康状况
   let summaryDict = [];
   for (let i = 0; i < dateList.length; i++) {
     let date = dateList[i];
@@ -222,36 +139,12 @@ exports.main = async (event, context) => {
   let questionsInfo = questionsRes.map(item => { return item.data });
   // console.log(questionsInfo);
   // 
-  var startTime = timestampToTime(jqInfo.creationTime + intervalTime);//开始时间，gmt
-  console.log("startTime: ", startTime);
-  let nowTime = timestampToTime(new Date().getTime() + intervalTime);//当前时间
-  console.log("nowTime: ", nowTime)
-  let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-  let endTime;
-  if (new Date().getTime() < new Date(deadline).getTime()) {
-    console.log('还未到截止日期');
-    endTime = nowTime;
-  } else {
-    var deadlineTime = timestampToTime(deadline)
-    endTime = deadlineTime
-  }
-  console.log("endTime: ", endTime)
-  let dateList = formatEveryDay(startTime, endTime);
-  if (jqInfo.type == 0) {
-    console.log("一次性");
-    dateList = [deadline];
-  }
-  if (jqInfo.type == 1) {
-    console.log("按月");
-    var date = jqInfo.date;
-    dateList = formatEveryMonthDay(startTime, endTime, date);
-  }
-  if (jqInfo.type == 3) {
-    console.log("按周");
-    var selectedDay = jqInfo.selectedDay;
-    dateList = formatEveryWeekDay(startTime, endTime, selectedDay)
-  }
-  console.log(startTime, endTime, '\n', dateList);
+  var currentPeriodStr = JSON.stringify(jqInfo.currentPeriod);
+  var periods = jqInfo.periods;
+  var periodsStr = periods.map(item => { return JSON.stringify(item) });
+  var index = periodsStr.indexOf(currentPeriodStr);
+  let dateList = periods.slice(0,index + 1).map(item => {return item[0]});
+  console.log(' dateList: \n', dateList);
   var summaryDict = formatData(questionsInfo, usersInfo, jqInfo, dateList);
   // return;
   try {

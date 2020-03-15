@@ -5,32 +5,6 @@
       <view class="icon-back back-btn" bindtap="goBack">返回主页</view>
     </view>
   </view>
-  <!-- <view class="search-box" style="margin-top:{{statusBarHeight + navigatorH}}px">
-    <view class="input-box">
-      <image src="{{images.search}}"></image>
-      <input bindinput="bindQ" style="flex: 1;padding: 10rpx;" placeholder="输入问卷编号" value="{{queryid}}"></input>
-      <view class="search" catchtap="search">搜索</view>
-    </view>
-  </view>
-  <view class="search-res" wx:if="{{resJQ}}">
-    <block wx:for="{{resJQ}}" wx:key="index">
-      <view class="item">
-        <view style="display: flex; align-items:center">
-          <image src="{{images.ques}}" style="width: 50rpx;height: 50rpx; margin-right:20rpx"></image>
-          <view>
-            <view 
-            style="font-size: 38rpx;margin-bottom: 10rpx;">
-            {{item.name}}</view>
-            <view style="color: #3c3c3c;font-size: 28rpx;">发布者：{{item.creatorName}}</view>
-          </view>
-        </view>
-        <view catchtap="fillJQ" data-id="{{item._id}}" data-name="{{item.name}}" style="color: #0FB148">进入填写</view>
-      </view>
-    </block>
-    <view style="text-align: center;font-size: 38rpx;color: #d81e06;" catchtap="cancel"> 
-      取消
-    </view>
-  </view> -->
   <view class="search-box" wx:if="{{!showSearch}}"  style="margin-top:{{statusBarHeight + navigatorH}}px">
     <view class="input-box" bindtap="showSearch">
       <image src="{{images.search}}"></image>

@@ -15,7 +15,7 @@ Page({
     univ: '',
     colls: ['手动输入'],
     coll: '',
-    _classes: ['手动输入'],
+    _classes: ['手动输入'], 
     _class: '',
     images: images,
     baiduToken: null,
@@ -382,8 +382,19 @@ Page({
         info["checkedCourses"] = this.data.checkedCourses;//勾选的课程
         info["isInterested"] = this.data.isCheckedCourse;//是否感兴趣，等价于是否选择了课程
         info["isFill"] = true
+
         // 将大学和学院名称保存至数据库
-        this.saveUnivColl(info);
+        var requiredInfo = {
+          univ: info.univ,
+          coll: info.coll,
+          _class: info._class,
+          phone: info.uphone,
+          email: info.uemail
+        };
+        this.saveUnivColl(requiredInfo).then(res => {
+          console.log(res);
+        })
+
         if (this.data.isCheckedCourse) {
           // 勾选课程
           if (!this.data.checkedCommitment) {
@@ -451,51 +462,44 @@ Page({
     })
     
   },
+
   saveUnivColl(info) {
+    console.log(" ========== saveUnivColl ========== ")
     var univ = info.univ;
     var coll = info.coll;
     var _class = info._class
-    console.log(univ, coll);
-    if (univ.trim() == '' || coll.trim() == '' || _class.trim() == '') {
-      // wx.showToast({
-      //   title: '大学信息和学院信息无效',
-      //   icon: 'none'
-      // })
-      // return;
-    } else {
-      var tasks = [];
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          addUniv: true,
-          univ: univ
-        }
-      }));
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          addColl: true,
-          coll: coll
-        }
-      }));
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          addClass: true,
-          _class: _class
-        }
-      }))
-
-      return new Promise((resolve, reject) => {
-        Promise.all(tasks).then(res => {
-          resolve(res)
-        }).catch(res => {
-          reject(res)
-        })
+    var tasks = [];
+    tasks.push(wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        addUniv: true,
+        univ: univ,
+      }
+    }));
+    tasks.push(wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        addColl: true,
+        coll: coll,
+      }
+    }));
+    tasks.push(wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        addClass: true,
+        _class: _class,
+      }
+    }))
+    return new Promise((resolve, reject) => {
+      Promise.all(tasks).then(res => {
+        console.log(res)
+        resolve(res)
+      }).catch(res => {
+        reject(res)
       })
-    }
-    
+    })
   },
+
   saveUserInfo(info) {
    return new Promise((resolve, reject) => {
      wx.cloud.callFunction({
@@ -528,7 +532,20 @@ Page({
           wx.authorize({
             scope: 'scope.userLocation',
             success() {
-              _this.chooseLocation();
+              let index = e.currentTarget.dataset.index;
+              wx.chooseLocation({
+                success: function (res) {
+                  console.log(res);
+                  if (index == '1') {
+                    _this.setData({ currentLocation: res.address })
+                  } else if (index == '0') {
+                    _this.setData({ idcardLocation: res.address })
+                  }
+                },
+                fail: res => {
+                  console.log(res)
+                }
+              })
             },
             fail: res => { console.log(res) }
           })

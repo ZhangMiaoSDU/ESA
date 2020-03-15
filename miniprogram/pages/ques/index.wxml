@@ -40,11 +40,11 @@
       <view class="title">问卷信息</view>
       <view class="mask-item"> 
         <view style="flex: 3;">问卷名称</view>
-        <input bindinput="bindQName"></input>
+        <input bindinput="bindQName" placeholder="必填"></input>
       </view>
       <view  class="mask-item">
         <view style="flex: 3;">创建者邮箱</view>
-        <input bindinput="bindEmail" value="{{email}}"></input>
+        <input bindinput="bindEmail" value="{{email}}" placeholder="必填"></input>
       </view>
       <view class="mask-item">
         <view style="flex: 3;">上级/备份邮箱1</view>

@@ -3,6 +3,7 @@ const cloud = require('wx-server-sdk')
 
 cloud.init({ env: 'esa'})
 const db = cloud.database();
+const _ = db.command
 const timedTaskDB = db.collection('timedtask');
 const noteDB = db.collection('note');
 const intStdDB = db.collection("intstd");
@@ -24,9 +25,17 @@ exports.main = async (event, context) => {
           }
         })
   } else if (event.addjq) {
-    return await db.collection('jq').add({
-      data: event.data
-    })
+    console.log("---------------------addjq-创建问卷------------------------")
+    var data = event.data
+    var addjqRes = await db.collection('jq').add({
+      data: data
+    });
+    var jqid = addjqRes._id;
+    var selectedGid = data.selectedGid;
+    for (let i = 0; i < selectedGid.length; i++) {
+      var groupRes = await db.collection('group').where({ id: selectedGid[i] }).update({ data: { jqs: _.addToSet(jqid)}})
+    }
+    return addjqRes;
   } else if (event.addquestion) {
     return await db.collection('question').add({
       data: event.data

@@ -24,7 +24,7 @@ Page({
       console.log(res);
       wx.hideLoading();
       if (res.data.email) {
-        this.setData({ email: res.data.email})
+        this.setData({ email: res.data.email, currentMail: res.data.email})
       } else {
         this.setData({hasMail: false})
       }
@@ -71,7 +71,7 @@ Page({
       var list = [];
       selectedGroup.map(item => {list = list.concat(item.list)});
       var number = list.length;
-      this.setData({list: list, number: number})
+      this.setData({ list: list, number: number})
     }
   },
   createJQ: function() {
@@ -86,7 +86,12 @@ Page({
       showMask: false,
       selectedGroup: null,
       number: null,
-      list: null
+      list: null,
+      email: this.data.currentMail,
+      secEmail: null,
+      secPhone: null,
+      _3rdEmail: null,
+     _3rdPhone: null,
     })
   },
 
@@ -95,6 +100,7 @@ Page({
     wx.showLoading({
       title: '加载中'
     })
+    var selectedGid = (this.data.selectedGroup || []).map(item => {return item.id});
     let info = {
       name: this.data.jq,
       email: this.data.email,
@@ -103,7 +109,8 @@ Page({
       _3rdEmail: this.data._3rdEmail || '',
       _3rdPhone: this.data._3rdPhone || '',
       number: this.data.number || 0,
-      list: this.data.list || []
+      list: this.data.list || [],
+      selectedGid: selectedGid
     }
     if (!info.name || (info.name.trim() == '') || !info.email || (info.email.trim() == '') ) {
       wx.showToast({
@@ -240,6 +247,7 @@ Page({
   bindsecEmail(e) {
     this.setData({ secEmail: e.detail.value})
   },
+ 
 
   bindsecPhone(e) {
     this.setData({ secPhone: e.detail.value })

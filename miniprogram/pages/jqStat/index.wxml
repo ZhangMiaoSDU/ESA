@@ -17,11 +17,11 @@
     <view id="dateChosen">
       <view class='select_box chosen-select form-control'>
         <view class='select' catchtap='selectTap'>
-            <text class='select_text'>{{dateList[index]}}</text>
+            <text class='select_text'>{{periods[index][0]}} - {{periods[index][1]}}</text>
             <image class='select_img {{selectShow&&"select_img_rotate"}}' src='../../images/pull.png'  background-size="contain"></image> 
         </view>
-        <view class='option_box' style='height:{{selectShow? (dateList.length > 5 ? 325 : dateList.length * 80 ): 0}}rpx;'>
-            <text class='option' wx:for='{{dateList}}' wx:key='this' data-index='{{index}}' catchtap='optionTap'>{{item}}</text>
+        <view class='option_box' style='height:{{selectShow? (periods.length > 5 ? 325 : periods.length * 80 ): 0}}rpx;'>
+            <text class='option' wx:for='{{periods}}' wx:key='this' data-index='{{index}}' catchtap='optionTap'>{{item[0]}}-{{item[1]}}</text>
         </view>
       </view>
     </view>

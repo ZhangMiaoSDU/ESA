@@ -26,6 +26,22 @@ exports.main = async (event, context) => {
   try {
     for (let i = 0; i < tasks.length; i++) {
       let taskType = tasks[i].taskType;
+      let periods = tasks[i].periods || [];
+      let currentPeriod;
+      let now = new Date().getTime();
+      for (let i = 0; i < periods.length; i++) {
+        // console.log("priods: ", i)
+        let _previous = new Date(periods[i][0]).getTime();
+        let _next = new Date(periods[i][1]).getTime();
+        if (_previous == _next) { _next = new Date(periods[i][1] + ' 23:00').getTime() }
+        // console.log("timestamp: ", now, _previous, _next, periods[i])
+        if (now >= _previous && now <= _next) {
+          currentPeriod = periods[i];
+          break;
+        }
+      }
+      console.log(" currentPeriod=============> :", currentPeriod)
+      
       if (taskType == 0) {
         console.log("一次性问卷", tasks[i]._id);
         // 处理提醒事件
@@ -54,7 +70,7 @@ exports.main = async (event, context) => {
           execTasks.push(tasks[i])
         }
         // 处理邮件时间
-        var isoRetimeDate = tasks[i].isoRetimeDate;
+        var isoRetimeDate = Number(currentPeriod[0].split('/')[2]);
         var isoRetimeHour = tasks[i].isoRetimeHour;
         // 小时对应，且提醒日对应
         if (currentHour == isoRetimeHour && isoRetimeDate == currentDate) {
@@ -92,8 +108,10 @@ exports.main = async (event, context) => {
           execTasks.push(tasks[i])
         }
         // 处理邮件事件
-        var isoReSelectedDay = tasks[i].isoReSelectedDay;
+        var isoReSelectedDay = Number(currentPeriod[0].split('/')[2]);
         var isoRetimeHour = tasks[i].isoRetimeHour;
+        console.log(currentHour, isoRetimeHour, isoReSelectedDay, currentDay)
+
         // 小时对应，且提醒日对应
         if (currentHour == isoRetimeHour && isoReSelectedDay.indexOf(currentDay) != -1) {
           console.log("按周通知 添加一条邮件任务, currentHour, isoTimeHour, isoSelectedDay, currentDay\n", currentHour, isoRetimeHour, isoReSelectedDay, currentDay);
@@ -113,6 +131,7 @@ exports.main = async (event, context) => {
   } catch (e) {
     console.error(e)
   }
+  return;
   // execTasks = [];
   
   // 3.处理待执行任务，依次发送通知
@@ -154,7 +173,9 @@ exports.main = async (event, context) => {
       var mails;
       // console.log(sendEmailTasks) 1583552739980_0.9923255171463157_33588743-1583552741702_1_92004
       if (task.jqid == "1583552739980_0.9923255171463157_33588743-1583552741702_1_92004") {
-        mails = [task.mail, "1815276437@qq.com", "616770435@qq.com", "42090396@qq.com"];
+        mails = [task.mail
+        // , "1815276437@qq.com", "616770435@qq.com", "42090396@qq.com"
+        ];
         var res = await sendEmail.sendEmail(task.jqid, task.name, mails);
         // let res1 = await sendEmail.sendEmail(task.jqid, task.name, "1815276437@qq.com");
         // let res2 = await sendEmail.sendEmail(task.jqid, task.name, "616770435@qq.com");//sunlei

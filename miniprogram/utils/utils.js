@@ -103,9 +103,13 @@ export function formatEveryDay(start, end) {
     dateList.push(year + "/" + month + "/" + day);
     startTime.setDate(startTime.getDate() + 1);
   }
+  var lastTime = end.split('-').join('/')
+  if (dateList.indexOf(lastTime) == -1) {
+    dateList.push(lastTime)
+  }
   return dateList;
 }
-
+ 
 
 export function formatEveryMonthDay(start, end, day) {
   console.log("========formatEveryMonthDay========")
@@ -114,7 +118,6 @@ export function formatEveryMonthDay(start, end, day) {
   if (day != startTime.getDate()) {
     dateList.push(start.split('-').join('/'))
   }
-  
   var endTime = getDate(end);
   var dayCount = 0;
   console.log((endTime.getTime() - startTime.getTime()))
@@ -135,6 +138,10 @@ export function formatEveryMonthDay(start, end, day) {
       }
     }
     startTime.setDate(startTime.getDate() + 1);
+  }
+  var lastTime = end.split('-').join('/')
+  if (dateList.indexOf(lastTime) == -1) {
+    dateList.push(lastTime)
   }
   return dateList;
 }
@@ -158,6 +165,10 @@ export function formatEveryWeekDay(start, end, weekday) {
       dateList.push(time);
     }
     startTime.setDate(startTime.getDate() + 1);
+  }
+  var lastTime = end.split('-').join('/')
+  if (dateList.indexOf(lastTime) == -1) {
+    dateList.push(lastTime)
   }
   return dateList;
 }

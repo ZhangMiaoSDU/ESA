@@ -24,7 +24,7 @@ const alert = async (jqid, jqName) => {
   if (currentPeriod) {
     if (jq.type == 1 || jq.type == 3) {
       var s = Number(currentPeriod[0].split('/')[2]);
-      var e = Number(currentPeriod[1].split('/')[2]) - 1;
+      var e = Number(currentPeriod[1].split('/')[2]);
       thing3 = "请填写" + s + '号至' + e + '号的问卷。'
     }
   }

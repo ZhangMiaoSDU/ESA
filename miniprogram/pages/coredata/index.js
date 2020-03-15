@@ -31,36 +31,17 @@ Page({
       jqs.map(item => { 
         if (item.type == 0) {
           console.log("一次性问卷 所有提交的人个数");
+          var resOneTime = this.getDayandPeriod(item);
+          console.log("resOneTime: ", resOneTime)
+          var currentDay = resOneTime[0], period = resOneTime[1];
           item.filled = item.jqUser ? item.jqUser.length : 0;
           item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
-          var startTime = timestampToTime(item.creationTime);//开始时间，gmt
-          console.log("startTime: ", startTime);
-          let deadline = item.deadline.split('-').join('/');//截止日期
-          item.period = [startTime.split('-').join('/'), deadline];
-        }
-        if (item.type == 1) {
-          console.log("按月 填写人数 = 记录当前时间段提交的人数");
-          var resMonth = this.fillByMonth(item);
-          console.log("remonth: ", resMonth)
-          var currentDay = resMonth[0], period = resMonth[1];
-          item.filled = item[currentDay] ? item[currentDay].length : 0;
-          item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
           item.period = period;
-        }
-        if (item.type == 2) {
-          console.log("按日 填写人数为记录每天的人数 应填人数为名单人员或之前提交问卷的人数");
-          var currentDay = _this.data.currentDay
-          console.log("currentDay: ", currentDay)
-          item.filled = item[currentDay] ? item[currentDay].length : 0;
-          item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
-          item.period = [currentDay];
-        }
-        if (item.type == 3) {
-          console.log("按周 填写人数 = 记录当前时间段提交的人数 应填人数 = 名单人员或之前提交问卷的人数");
-          var resWeek = this.fillByWeek(item);
+        } else {
+          var resWeek = this.getDayandPeriod(item);
           console.log("resWeek: ", resWeek)
           var currentDay = resWeek[0], period = resWeek[1];
-          item.filled = item[currentDay] ? item[currentDay].length : 0;
+          item.filled = item.currentRecord ? item.currentRecord : 0;
           item.required = item.number ? item.number : item.jqUser ? item.jqUser.length : 0;
           item.period = period;
         }
@@ -70,60 +51,9 @@ Page({
     })
 
   },
-  fillByMonth(jqInfo) {
-    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
-    console.log("startTime: ", startTime);
-    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    let endTime;
-    var deadlineTime = timestampToTime(deadline)
-    endTime = deadlineTime;
-    console.log("endTime: ", endTime)
-    var day = jqInfo.date;
-    var dateList = utils.formatEveryMonthDay(startTime, endTime, day);
-    console.log(dateList, startTime, endTime, day)
-    let currentDay, period;
-    var now = new Date().getTime();//当前时间戳
-    for (let i = 0; i < dateList.length - 1; i++) {
-      var dateTimestamp = new Date(dateList[i]).getTime();
-      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
-      if (now >= dateTimestamp && now < nextdateTimestamp) {
-        currentDay = dateList[i];
-        period = [dateList[i], dateList[i + 1]];
-      }
-      if (now >= dateTimestamp && !nextdateTimestamp) {
-        currentDay = dateList[i];
-        period = [dateList[i], endTime.split('-').join('/')];
-      }
-    }
-    return [currentDay, period];
-  },
 
-  fillByWeek(jqInfo) {
-    var startTime = timestampToTime(jqInfo.creationTime);//开始时间，gmt
-    console.log("startTime: ", startTime);
-    let deadline = jqInfo.deadline.split('-').join('/');//截止日期
-    let endTime;
-    var deadlineTime = timestampToTime(deadline)
-    endTime = deadlineTime;
-    console.log("endTime: ", endTime)
-    var selectedDay = jqInfo.selectedDay;
-    var dateList = utils.formatEveryWeekDay(startTime, endTime, selectedDay);
-    console.log("fillByWeek ========> dateList: ", dateList)
-    var currentDay, period;
-    var now = new Date().getTime();//当前时间戳
-    for (let i = 0; i < dateList.length; i++) {
-      var dateTimestamp = new Date(dateList[i]).getTime();
-      var nextdateTimestamp = new Date(dateList[i + 1]).getTime();
-      if (now >= dateTimestamp && now < nextdateTimestamp) {
-        currentDay = dateList[i];
-        period = [dateList[i], dateList[i + 1]];
-      }
-      if (now >= dateTimestamp && !nextdateTimestamp) {
-        currentDay = dateList[i];
-        period = [dateList[i], endTime.split('-').join('/')];
-      }
-    }
-    return [currentDay, period];
+  getDayandPeriod(jqInfo) {
+    return [jqInfo.saveRecordDay, jqInfo.currentPeriod]
   },
 
   loadJQ(userId) {
@@ -243,25 +173,7 @@ Page({
     var jqid = e.currentTarget.dataset.id;
     var jqsInfo = this.data.jqs;
     var currentjqInfo = jqsInfo.filter(item => { return item._id == jqid })[0];
-    var currentDay = this.data.currentDay;
-    if (currentjqInfo.type == 0) {
-      console.log("一次性问卷 查看未填写人员");
-      var deadline = currentjqInfo.deadline;//一次性文问卷截止日期
-      currentDay = deadline.split('-').join("/");
-    }
-    if (currentjqInfo.type == 1) {
-      console.log("按月 未填写人 = 记录当前时间段未提交的人数");
-      var resMonth = this.fillByMonth(currentjqInfo);
-      console.log("remonth: ", resMonth)
-      currentDay = resMonth[0];
-    }
-
-    if (currentjqInfo.type == 3) {
-      console.log("按月 未填写人 = 记录当前时间段未提交的人数");
-      var resWeek = this.fillByWeek(currentjqInfo);
-      console.log("resWeek: ", resWeek)
-      currentDay = resWeek[0];
-    }
+    var currentDay = currentjqInfo.saveRecordDay;
     // console.log(currentDay, currentjqInfo)
     var filledUserId = currentjqInfo[currentDay] || [];
     // 应填名单
@@ -294,25 +206,7 @@ Page({
     var jqid = e.currentTarget.dataset.id;
     var jqsInfo = this.data.jqs;
     var currentjqInfo = jqsInfo.filter(item => { return item._id == jqid })[0];
-    var currentDay = this.data.currentDay;
-    if (currentjqInfo.type == 0) {
-      console.log("一次性问卷 查看填写人员");
-      var deadline = currentjqInfo.deadline;//一次性文问卷截止日期
-      currentDay = deadline.split('-').join("/");
-    }
-    if (currentjqInfo.type == 1) {
-      console.log("按月 填写人 = 记录当前时间段未提交的人数");
-      var resMonth = this.fillByMonth(currentjqInfo);
-      console.log("remonth: ", resMonth)
-      currentDay = resMonth[0];
-    }
-
-    if (currentjqInfo.type == 3) {
-      console.log("按月 填写人 = 记录当前时间段未提交的人数");
-      var resWeek = this.fillByWeek(currentjqInfo);
-      console.log("resWeek: ", resWeek)
-      currentDay = resWeek[0];
-    }
+    var currentDay = currentjqInfo.saveRecordDay;
     console.log(currentDay, currentjqInfo)
     var filledUserId = currentjqInfo[currentDay] || [];
     var list = currentjqInfo.list;

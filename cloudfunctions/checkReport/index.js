@@ -24,9 +24,11 @@ function getFTime() {
   let month = String((new Date().getMonth() + 1)).length == 1 ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)
   return [new Date().getFullYear(), month, new Date().getDate()].join('/')
 }
-
+const sendEmailToTutor = require('sendtotutor.js')
 // 云函数入口函数
 exports.main = async (event, context) => {
+  sendEmailToTutor.sendEmailToTutor();
+  return;
   let isoTime = getFTime();//当前日期
   let tasks = [];
   for (let i = 0; i < requiredQuestionId.length; i++) {

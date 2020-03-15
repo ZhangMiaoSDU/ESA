@@ -1,9 +1,49 @@
 /* pages/config/index.wxss */
 @import "../../style/zui.wxss";
 .item {
-  height: 40px;
-  line-height: 40px;
-  margin: 0 10px;
+  margin: 20rpx;
+  color: rgb(242,79,85);
   border-bottom: 1px solid #ddd;
 }
 
+
+.item .description {
+  font-size: 20rpx;
+  color: #3c3c3c;
+  margin: 20rpx 0;
+}
+
+.description text {
+  display: block;
+  margin-top: 10rpx;
+}
+
+
+.content-header {
+  text-align: center;
+  font-size: 40rpx; 
+  color: rgb(242,79,85);
+  margin: 20rpx 0;
+}
+
+.btn-view {
+  background: #fff;
+  margin: 20rpx 0;
+}
+
+.btn {
+  background: rgb(242,79,85, .1);
+  color: rgb(242,79,85);
+}
+
+.picker-view {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  font-size: 26rpx
+}
+
+.picker-view image {
+  width: 30rpx;
+  height: 30rpx;
+}

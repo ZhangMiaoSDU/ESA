@@ -151,11 +151,11 @@ Page({
       title: '加载中',
     })
     // 保存
-    // console.log(typeof (this.saveUnivColl(requiredInfo)));
-    if (this.checkSave(requiredInfo) == true) {
-      var groupId = this.saveUnivColl(requiredInfo);
-      console.log("confirmCreate =======> groupId: ", groupId);
-      this.saveGroup().then(res => {
+    this.saveUnivColl(requiredInfo).then(res => {
+      console.log(res);
+      var groupId = res.map(item => {return item.result}).join('');
+      // return;
+      this.saveGroup(groupId).then(res => {
         console.log(res);
         wx.hideLoading();
         if (res.result == 0) {
@@ -170,154 +170,60 @@ Page({
           url: '../mem/index',
         })
       })
-      .catch(res => {console.log(res)})
-    } else {
-      var univLen, collLen, classLen;
-      this.reGetLength().then(resData => {
-        for (let i = 0; i < resData.length; i++) {
-          if (resData[i]._id == 'UNIV') { univLen = resData[i].name.length}
-          if (resData[i]._id == 'COLL') { collLen = resData[i].name.length }
-          if (resData[i]._id == '_CLASS') { classLen = resData[i].name.length }
-        }
-        console.log("univLen, collLen, classLen ====> ", univLen, collLen, classLen)
-        this.saveUnivColl(requiredInfo, univLen, collLen, classLen).then(res => {
-          console.log(res);
-          // return;
-          this.saveGroup().then(res => {
-            console.log(res);
-            wx.hideLoading();
-            if (res.result == 0) {
-              wx.showModal({
-                title: '提示',
-                content: '该组已存在',
-                showCancel: false
-              })
-              return;
-            }
-            wx.switchTab({
-              url: '../mem/index',
-            })
-          })
-          .catch(res => { console.log(res); })
-        })
-      })
-     
-    }
-  },
-  reGetLength() {
-    return new Promise((resolve, reject) => {
-      univcollDB.get().then(res => {
-        var data = res.data;
-        resolve(data)
-      }).catch(res => {reject(res)})
+        .catch(res => { console.log(res); })
     })
   },
-  checkSave(info) {
-    var univ = info.univ;
-    var coll = info.coll;
-    var _class = info._class
-    console.log("checkSave ======> info", info)
-    var univIndex = this.data.univs.indexOf(univ);
-    var isNewUniv = univIndex == -1 ? true : false;
-    var collIndex = this.data.colls.indexOf(coll);
-    var isNewColl = collIndex == -1 ? true : false;
-    var classIndex = this.data._classes.indexOf(_class);
-    var isNewClass = classIndex == -1 ? true : false;
-    console.log("isNewUniv: ", isNewUniv, "isNewColl: ", isNewColl, "isNewClass: ", isNewClass)
-    if (isNewUniv == false && isNewColl == false && isNewClass == false) {
-      console.log("--true---")
-      return true;
-    } else {
-      console.log("--false---")
-      return false;
-    }
-  },
-  saveUnivColl(info, univLen, collLen, classLen) {
-    console.log("saveUnivColl ==========> univLen, collLen, classLen: ", univLen, collLen, classLen)
+
+
+  saveUnivColl(info) {
+    console.log(" ========== saveUnivColl ========== ", )
     var univ = info.univ;
     var coll = info.coll;
     var _class = info._class
     var tasks = [];
-    var univIndex = this.data.univs.indexOf(univ);
-    var isNewUniv = univIndex == -1 ? true : false;
-    if (isNewUniv) {
-      console.log("isNewUniv: ", isNewUniv, univ)
-      var univlen = univLen + 1;
-      var univid = univlen < 10 ? '00' + univlen : univlen < 100 ? '0' + univlen : String(univlen);
-      this.setData({ univid: univid })
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          addUniv: true,
-          univ: univ,
-          univid: univid
-        }
-      }));
-    } else {
-      this.setData({ univid: this.data.univsids[univIndex] })
-    }
-    var collIndex = this.data.colls.indexOf(coll);
-    var isNewColl = collIndex == -1 ? true : false;
-    if (isNewColl) {
-      console.log("isNewColl: ", isNewColl, coll)
-      var colllen = collLen + 1;
-      var collid = colllen < 10 ? '00' + colllen : colllen < 100 ? '0' + colllen : String(colllen);
-      this.setData({collid: collid})
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          addColl: true,
-          coll: coll,
-          collid: collid
-        }
-      }));
-    } else {
-      this.setData({ collid: this.data.collsids[collIndex] })
-    }
-    var classIndex = this.data._classes.indexOf(_class);
-    var isNewClass = classIndex == -1 ? true : false;
-    if (isNewClass) {
-      console.log("isNewClass: ", isNewClass, _class)
-      var _classlen = classLen + 1;
-      var _classid = _classlen < 10 ? '00' + _classlen : _classlen < 100 ? '0' + _classlen : String(_classlen);
-      this.setData({ _classid: _classid })
-      tasks.push(wx.cloud.callFunction({
-        name: 'updateDoc',
-        data: {
-          addClass: true,
-          _class: _class,
-          _classid: _classid
-        }
-      }))
-    } else {
-      this.setData({ _classid: this.data._classesids[classIndex] })
-    }
-    if (tasks.length == 0) {
-      return `${this.data.univsids[univIndex]}${this.data.collsids[collIndex]}${this.data._classesids[classIndex]}`;
-    } else {
-      return new Promise((resolve, reject) => {
-        Promise.all(tasks).then(res => {
-          console.log(res)
-          resolve(res)
-        }).catch(res => {
-          reject(res)
-        })
+    tasks.push(wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        addUniv: true,
+        univ: univ,
+      }
+    }));
+    tasks.push(wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        addColl: true,
+        coll: coll,
+      }
+    }));
+    tasks.push(wx.cloud.callFunction({
+      name: 'updateDoc',
+      data: {
+        addClass: true,
+        _class: _class,
+      }
+    }))
+    return new Promise((resolve, reject) => {
+      Promise.all(tasks).then(res => {
+        console.log(res)
+        resolve(res)
+      }).catch(res => {
+        reject(res)
       })
-    }
+    })
   },
-  saveGroup() {
-    var univ = this.data.univ, univid = this.data.univid;
-    var coll = this.data.coll, collid = this.data.collid;
-    var _class = this.data._class, _classid = this.data._classid;
+  saveGroup(groupId) {
+    var univ = this.data.univ;
+    var coll = this.data.coll;
+    var _class = this.data._class;
     var creatorId = app.globalData.openid, uname = this.data.uname, 
                     uphone = this.data.uphone, uemail = this.data.uemail;
-    console.log(`${univid}${collid}${_classid}`)
+    console.log(groupId)
     var data = {
       creator: creatorId,//创建人id
       email: uemail,//创建人联系电话
       phone: uphone,//创建人邮箱
       creationTime: new Date().getTime(),//创建时间
-      id: `${univid}${collid}${_classid}`,//组id
+      id: groupId,//组id
       name: `${univ}>${coll}>${_class}`,//组名
       listid: [creatorId],
       list: [{name: uname, id: creatorId, phone: uphone}]
